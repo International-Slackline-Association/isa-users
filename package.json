@@ -8,7 +8,9 @@
     "prettifyAll": "prettier --write '{src,test}/**/*.ts'",
     "checkTs": "tsc --noEmit",
     "package": "serverless package",
-    "deploy": "serverless deploy"
+    "deploy": "serverless deploy --verbose",
+    "deploy:api": "serverless deploy function -f api",
+    "deploy:cognito": "serverless deploy function -f cognitoTrigger"
   },
   "engines": {
     "node": ">=16.13.2"
@@ -16,11 +18,15 @@
   "dependencies": {
     "@middy/core": "^3.0.4",
     "@middy/http-json-body-parser": "^3.0.4",
-    "lodash.clonedeep": "4.5.0"
+    "@vendia/serverless-express": "4.8.2",
+    "express": "4.18.1",
+    "lodash.clonedeep": "4.5.0",
+    "winston": "3.7.2"
   },
   "devDependencies": {
     "@serverless/typescript": "3.19.0",
     "@types/aws-lambda": "8.10.100",
+    "@types/express": "4.17.13",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/node": "16.0.0",
     "@typescript-eslint/eslint-plugin": "5.28.0",
@@ -32,8 +38,11 @@
     "json-schema-to-ts": "2.5.3",
     "serverless": "3.19.0",
     "serverless-esbuild": "1.30.0",
+    "serverless-prune-plugin": "2.0.1",
+    "serverless-plugin-log-subscription": "2.1.2",
     "ts-node": "10.8.1",
     "tsconfig-paths": "4.0.0",
+    "type-fest": "2.13.1",
     "typescript": "4.7.4"
   },
   "author": "Can Sahin",

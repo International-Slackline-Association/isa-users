@@ -1,17 +1,20 @@
 import { DDBTableKeyAttrs } from 'core/db/types';
 
 interface ParsedKeyAttrs {
-  email: string;
+  userId: string;
 }
-
 interface NonKeyAttrs {
-  cognitoUsername: string;
+  cognitoSub: string;
+  email: string;
   name: string;
   surname: string;
+  identityType: 'individual' | 'club';
   gender?: 'm' | 'f';
-  identityType?: 'person' | 'club';
+  birthDate?: string;
+  phoneNumber?: string;
   city?: string;
   country?: string;
+  emergencyContact?: string;
 }
 
 export type DDBUserDetailItem = ParsedKeyAttrs & NonKeyAttrs;

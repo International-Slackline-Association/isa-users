@@ -1,11 +1,13 @@
 import type { AWS } from '@serverless/typescript';
 
 import api from '@functions/api';
+import cognitoTrigger from '@functions/cognito';
+import logger from '@functions/logger';
 
 const serverlessConfiguration: AWS = {
   service: 'isa-users',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-plugin-log-subscription', 'serverless-esbuild', 'serverless-prune-plugin'],
   provider: {
     name: 'aws',
     runtime: 'nodejs16.x',
@@ -19,10 +21,36 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      ISA_USERS_TABLE: { Ref: 'UsersTable' },
+      APPLICATION_LOG_GROUP_NAME: { Ref: 'CloudWatchApplicationLogs' },
+    },
+    iam: {
+      role: {
+        statements: [
+          {
+            Effect: 'Allow',
+            Action: ['dynamodb:*'],
+            Resource: [
+              {
+                'Fn::Join': ['', [{ 'Fn::GetAtt': ['UsersTable', 'Arn'] }, '*']],
+              },
+            ],
+          },
+          {
+            Effect: 'Allow',
+            Action: ['logs:*'],
+            Resource: [
+              {
+                'Fn::GetAtt': ['CloudWatchApplicationLogs', 'Arn'],
+              },
+            ],
+          },
+        ],
+      },
     },
   },
   // import the function via paths
-  functions: { api },
+  functions: { api, cognitoTrigger, logger },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -34,6 +62,17 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+    prune: {
+      automatic: true,
+      number: 5,
+    },
+    logSubscription: {
+      enabled: true,
+      filterPattern: '{ $.level = "*" && $.message = "*" }',
+      destinationArn: {
+        'Fn::GetAtt': ['LoggerLambdaFunction', 'Arn'],
+      },
     },
   },
   resources: {
@@ -106,7 +145,6 @@ const serverlessConfiguration: AWS = {
       },
       CloudWatchApplicationLogs: {
         Type: 'AWS::Logs::LogGroup',
-        DeletionPolicy: 'Retain',
         Properties: {
           LogGroupName: 'isa-users/ApplicationLogs',
           RetentionInDays: 90,

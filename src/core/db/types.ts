@@ -16,3 +16,11 @@ export interface GSILastEvaluatedKey {
   readonly SK_GSI: string;
   readonly GSI_SK: string;
 }
+
+export type TransformerParams<T> = {
+  [key in keyof DDBTableKeyAttrs]?: {
+    fields?: (keyof T)[];
+    compose: (params: { [key in keyof T]?: T[key] }) => string;
+    destruct?: (key: string) => { [key in keyof T]?: T[key] };
+  };
+};

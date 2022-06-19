@@ -1,17 +1,15 @@
 import type { AWS } from '@serverless/typescript';
+
 import { handlerPath } from 'core/utils/lambda';
 
 const lambda: AWS['functions'][0] = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
-      http: {
-        method: 'any',
-        path: '/{proxy+}',
-        cors: true,
-        authorizer: {
-          arn: '${ssm:isa-users-cognitoPoolArn}',
-        },
+      cognitoUserPool: {
+        existing: true,
+        trigger: 'PostConfirmation',
+        pool: 'isa-users',
       },
     },
   ],

@@ -1,5 +1,5 @@
-| PK           | SK_GSI    | LSI | GSI_SK | ...Attributes |
-| ------------ | --------- | --- | ------ | ------------- |
-| user:{email} | user      |     |        | ...           |
-| user:{email} | club:{id} |     |        | ...           |
-| club:{id}    | club      |     |        | ...           |
+| PK        | SK_GSI      | LSI | GSI_SK        | ...Attributes |
+| --------- | ----------- | --- | ------------- | ------------- |
+| user:{id} | userDetails |     |               | ...           |
+| user:{id} | club:{id}   |     |               | ...           |
+| club:{id} | clubDetails |     | email:{email} | ...           |

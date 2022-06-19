@@ -1,28 +1,24 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
 import { DDBUserDetailAttrs, DDBUserDetailItem } from 'core/db/user/details/types';
-import { compositeKey, destructKey, transformUtils } from 'core/db/utils';
+import { composeKey, destructKey, TABLE_NAME, transformUtils } from 'core/db/utils';
 
 const { key, attrsToItem, itemToAttrs } = transformUtils<DDBUserDetailItem, DDBUserDetailAttrs>({
   PK: {
-    fields: ['email'],
-    compose: (params) => compositeKey('user', params.email),
+    fields: ['userId'],
+    compose: (params) => composeKey('user', params.userId),
     destruct: (key) => ({
-      email: destructKey(key, 1),
+      userId: destructKey(key, 1),
     }),
   },
   SK_GSI: {
-    compose: () => 'user',
+    compose: () => 'userDetails',
   },
 });
 
-export const getUser = async (email: string) => {
-  const params: DocumentClient.GetItemInput = {
-    TableName: '',
-    Key: key({ email }),
-  };
+export const getUser = async (userId: string) => {
   return ddb
-    .get(params)
+    .get({ TableName: TABLE_NAME, Key: key({ userId }) })
     .promise()
     .then((data) => {
       if (data.Item) {
@@ -32,10 +28,22 @@ export const getUser = async (email: string) => {
     });
 };
 
+export const getUsers = async (userIds: string[]) => {
+  return ddb
+    .batchGet({
+      RequestItems: {
+        TABLE_NAME: {
+          Keys: userIds.map((id) => key({ userId: id })),
+        },
+      },
+    })
+    .promise()
+    .then((data) => {
+      const items = data.Responses?.TABLE_NAME || [];
+      return items.map((i: DDBUserDetailAttrs) => attrsToItem(i));
+    });
+};
+
 export const putUser = async (user: DDBUserDetailItem) => {
-  const params: DocumentClient.PutItemInput = {
-    TableName: '',
-    Item: itemToAttrs(user),
-  };
-  return ddb.put(params).promise();
+  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(user) }).promise();
 };
