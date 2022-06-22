@@ -32,7 +32,23 @@ export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res
   res.end();
 };
 
+export const addUserToClub = async (req: Request, res: Response) => {
+  const clubId = req.params.id;
+  await db.putUserClub({ clubId: clubId, userId: req.user.email, isPendingApproval: true });
+  // TODO: Send email to club
+  res.end();
+};
+
+export const removeUserToClub = async (req: Request, res: Response) => {
+  const clubId = req.params.id;
+  await db.removeUserClub(clubId, req.user.email);
+  // TODO: Send email to club
+  res.end();
+};
+
 export const userApi = express.Router();
 userApi.get('/details', catchExpressJsErrorWrapper(getUserDetails));
+userApi.put('/details', catchExpressJsErrorWrapper(updateUser));
 userApi.get('/clubs', catchExpressJsErrorWrapper(getClubsOfUser));
-userApi.put('/:id', catchExpressJsErrorWrapper(updateUser));
+userApi.post('/club/:id', catchExpressJsErrorWrapper(addUserToClub));
+userApi.delete('/club/:id', catchExpressJsErrorWrapper(removeUserToClub));

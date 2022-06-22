@@ -3,7 +3,7 @@ import { ddb } from 'core/aws/clients';
 import { DDBUserClubAttrs, DDBUserClubItem } from 'core/db/user/clubs/types';
 import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
-const { attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DDBUserClubItem, DDBUserClubAttrs>({
+const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<DDBUserClubItem, DDBUserClubAttrs>({
   PK: {
     fields: ['userId'],
     compose: (params) => composeKey('user', params.userId),
@@ -63,4 +63,8 @@ export const getUsersOfClub = async (clubId: string) => {
 
 export const putUserClub = async (club: DDBUserClubItem) => {
   return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
+};
+
+export const removeUserClub = async (clubId: string, userId: string) => {
+  return ddb.delete({ TableName: TABLE_NAME, Key: key({ clubId, userId }) }).promise();
 };
