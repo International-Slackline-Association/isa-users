@@ -1,6 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
-import { DDBClubAttrs, DDBClubItem } from 'core/db/clubs/types';
+import { DDBClubAttrs, DDBClubItem } from 'core/db/club/types';
 import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
 const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DDBClubItem, DDBClubAttrs>({
@@ -15,11 +15,7 @@ const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DD
     compose: () => 'clubDetails',
   },
   GSI_SK: {
-    fields: ['email'],
-    compose: (params) => composeKey('email', params.email),
-    destruct: (key) => ({
-      email: destructKey(key, 1),
-    }),
+    compose: () => 'clubDetails',
   },
 });
 
@@ -27,34 +23,13 @@ export const getAllClubs = async () => {
   return ddb
     .query({
       TableName: TABLE_NAME,
+      IndexName: INDEX_NAMES.GSI,
       KeyConditionExpression: '#SK_GSI = :SK_GSI',
       ExpressionAttributeNames: {
         '#SK_GSI': keyFields.SK_GSI,
       },
       ExpressionAttributeValues: {
         ':SK_GSI': keyUtils.SK_GSI.compose({}),
-      },
-    })
-    .promise()
-    .then((data) => {
-      const items = data.Items || [];
-      return items.map((i: DDBClubAttrs) => attrsToItem(i));
-    });
-};
-
-export const getClubsWithEmail = async (email: string) => {
-  return ddb
-    .query({
-      TableName: TABLE_NAME,
-      IndexName: INDEX_NAMES.GSI,
-      KeyConditionExpression: '#SK_GSI = :SK_GSI and #GSI_SK = :GSI_SK',
-      ExpressionAttributeNames: {
-        '#SK_GSI': keyFields.SK_GSI,
-        '#GSI_SK': keyFields.GSI_SK,
-      },
-      ExpressionAttributeValues: {
-        ':SK_GSI': keyUtils.SK_GSI.compose({}),
-        ':GSI_SK': keyUtils.GSI_SK.compose({ email }),
       },
     })
     .promise()
@@ -80,14 +55,14 @@ export const getClubs = async (clubIds: string[]) => {
   return ddb
     .batchGet({
       RequestItems: {
-        TABLE_NAME: {
+        [TABLE_NAME]: {
           Keys: clubIds.map((id) => key({ clubId: id })),
         },
       },
     })
     .promise()
     .then((data) => {
-      const items = data.Responses?.TABLE_NAME || [];
+      const items = data.Responses[TABLE_NAME] || [];
       return items.map((i: DDBClubAttrs) => attrsToItem(i));
     });
 };

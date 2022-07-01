@@ -18,6 +18,9 @@ const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<DD
       clubId: destructKey(key, 1),
     }),
   },
+  GSI_SK: {
+    compose: () => 'details',
+  },
 });
 
 export const getClubsOfUser = async (userId: string) => {
@@ -61,10 +64,49 @@ export const getUsersOfClub = async (clubId: string) => {
     });
 };
 
+export const getUserClub = async (userId: string, clubId: string) => {
+  return ddb
+    .get({
+      TableName: TABLE_NAME,
+      Key: key({ userId, clubId }),
+    })
+    .promise()
+    .then((data) => {
+      if (data.Item) {
+        return attrsToItem(data.Item as DDBUserClubAttrs);
+      }
+      return null;
+    });
+};
+
 export const putUserClub = async (club: DDBUserClubItem) => {
   return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
 };
 
-export const removeUserClub = async (clubId: string, userId: string) => {
+export const updateUserClub = async (club: DDBUserClubItem) => {
+  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
+};
+
+export async function updateClubField<T extends keyof DDBUserClubItem>(
+  clubId: string,
+  userId: string,
+  field: T,
+  value: DDBUserClubItem[T],
+) {
+  const params: DocumentClient.UpdateItemInput = {
+    TableName: TABLE_NAME,
+    Key: key({ userId, clubId }),
+    UpdateExpression: `SET #field = :v`,
+    ExpressionAttributeNames: {
+      '#field': field,
+    },
+    ExpressionAttributeValues: {
+      ':v': value,
+    },
+  };
+  return ddb.update(params).promise();
+}
+
+export const removeUserClub = async (userId: string, clubId: string) => {
   return ddb.delete({ TableName: TABLE_NAME, Key: key({ clubId, userId }) }).promise();
 };

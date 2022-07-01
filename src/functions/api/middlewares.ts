@@ -36,5 +36,5 @@ export const errorMiddleware: ErrorRequestHandler = async (error, req, res, next
 };
 
 export const notFoundMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  res.status(404).json({ error: '404 Not Found' });
+  res.status(404).json({ message: '404 Not Found' });
 };

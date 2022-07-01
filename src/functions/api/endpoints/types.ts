@@ -1,11 +1,8 @@
-export interface CreateClubPostBody {
-  clubId: string;
-  email: string;
+export interface UpdateClubPostBody {
   name: string;
   profilePictureUrl?: string;
   city?: string;
   country?: string;
-  memberType?: 'active' | 'observer' | 'partner';
   contactPhone?: string;
 }
 
@@ -18,4 +15,5 @@ export interface UpdateUserPostBody {
   city?: string;
   country?: string;
   emergencyContact?: string;
+  profilePictureUrl?: string;
 }

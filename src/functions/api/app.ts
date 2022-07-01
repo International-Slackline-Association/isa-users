@@ -1,4 +1,5 @@
 import { default as express, Express, urlencoded, json } from 'express';
+import cors from 'cors';
 
 import { injectCommonlyUsedHeadersMiddleware, errorMiddleware, notFoundMiddleware } from '@functions/api/middlewares';
 import { userApi } from '@functions/api/endpoints/user-api';
@@ -7,7 +8,7 @@ import { clubApi } from '@functions/api/endpoints/club-api';
 const app = express();
 
 const setupExpressApp = (app: Express) => {
-  // app.use(cors());
+  app.use(cors());
   app.use(json());
   app.use(
     urlencoded({

@@ -14,6 +14,9 @@ const { key, attrsToItem, itemToAttrs } = transformUtils<DDBUserDetailItem, DDBU
   SK_GSI: {
     compose: () => 'userDetails',
   },
+  GSI_SK: {
+    compose: () => 'userDetails',
+  },
 });
 
 export const getUser = async (userId: string) => {
@@ -32,14 +35,14 @@ export const getUsers = async (userIds: string[]) => {
   return ddb
     .batchGet({
       RequestItems: {
-        TABLE_NAME: {
+        [TABLE_NAME]: {
           Keys: userIds.map((id) => key({ userId: id })),
         },
       },
     })
     .promise()
     .then((data) => {
-      const items = data.Responses?.TABLE_NAME || [];
+      const items = data.Responses?.[TABLE_NAME] || [];
       return items.map((i: DDBUserDetailAttrs) => attrsToItem(i));
     });
 };

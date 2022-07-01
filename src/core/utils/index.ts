@@ -6,9 +6,8 @@ const hasValue = (v: any) => {
 
 export const assignExistingFields = <T, U>(obj1: T, obj2: U): T => {
   const v = cloneDeep(obj1);
-
   for (const [key, value] of Object.entries(obj2)) {
-    if (hasValue(value) && key in v) {
+    if (hasValue(value)) {
       v[key] = value;
     }
   }

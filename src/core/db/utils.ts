@@ -25,7 +25,9 @@ export const transformUtils = <DDBItem, DDBAttrs extends DDBTableKeyAttrs>(
     const { PK, SK_GSI, LSI, GSI_SK, ...rest } = attrs;
     let item = { ...rest };
     for (const [key, value] of Object.entries(keyUtils)) {
-      item = { ...item, ...value.destruct(attrs[key]) };
+      if (value.destruct) {
+        item = { ...item, ...value.destruct(attrs[key]) };
+      }
     }
     return item as unknown as DDBItem;
   };
@@ -50,7 +52,7 @@ export const transformUtils = <DDBItem, DDBAttrs extends DDBTableKeyAttrs>(
   return { key, attrsToItem, itemToAttrs, keyFields, keyUtils };
 };
 
-const delimeter = '::';
+const delimeter = ':';
 export const composeKey = (base: string, ...params: string[]) => {
   let str = base;
   for (const param of params) {

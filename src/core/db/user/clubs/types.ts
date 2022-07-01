@@ -7,6 +7,7 @@ interface KeyAttrsParsed {
 
 interface NonKeyAttrs {
   isPendingApproval?: boolean;
+  joinedAt?: string;
 }
 
 export type DDBUserClubItem = KeyAttrsParsed & NonKeyAttrs;
