@@ -3,14 +3,16 @@ import { getCurrentInvoke } from '@vendia/serverless-express';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { logger } from 'core/logger';
+import { generateIdFromEmail } from 'core/utils';
 
-export const injectCommonlyUsedHeadersMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const injectCommonlyUsedHeadersMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   const event = getCurrentInvoke().event as APIGatewayProxyEvent;
   const claims = event.requestContext.authorizer?.claims;
   if (claims) {
     req.user = {
-      email: claims.email,
-      sub: claims.sub,
+      id: generateIdFromEmail(claims.email),
+      // email: claims.email,
+      // sub: claims.sub,
     };
   }
   next();
@@ -35,6 +37,6 @@ export const errorMiddleware: ErrorRequestHandler = async (error, req, res, next
   });
 };
 
-export const notFoundMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const notFoundMiddleware = (_req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({ message: '404 Not Found' });
 };

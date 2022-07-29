@@ -2,7 +2,10 @@ export interface DDBTableKeyAttrs {
   readonly PK: string;
   readonly SK_GSI: string;
   readonly LSI: string;
+  readonly LSI2: string;
   readonly GSI_SK: string;
+  readonly GSI2: string;
+  readonly GSI2_SK: string;
 }
 
 export interface LSILastEvaluatedKey {
@@ -11,10 +14,22 @@ export interface LSILastEvaluatedKey {
   readonly LSI: string;
 }
 
+export interface LSI2LastEvaluatedKey {
+  readonly PK: string;
+  readonly SK_GSI: string;
+  readonly LS2: string;
+}
+
 export interface GSILastEvaluatedKey {
   readonly PK: string;
   readonly SK_GSI: string;
   readonly GSI_SK: string;
+}
+
+export interface GSI2LastEvaluatedKey {
+  readonly PK: string;
+  readonly GSI2: string;
+  readonly GSI2_SK: string;
 }
 
 export type TransformerParams<T> = {

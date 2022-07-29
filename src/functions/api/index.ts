@@ -8,7 +8,18 @@ const lambda: AWS['functions'][0] = {
       http: {
         method: 'any',
         path: '/{proxy+}',
-        cors: true,
+        cors: {
+          origin: '*',
+          headers: [
+            'Content-Type',
+            'X-Amz-Date',
+            'Authorization',
+            'X-Api-Key',
+            'X-Amz-Security-Token',
+            'X-Amz-User-Agent',
+            'x-isa-id',
+          ],
+        },
         authorizer: {
           arn: '${ssm:isa-users-cognitoPoolArn}',
         },

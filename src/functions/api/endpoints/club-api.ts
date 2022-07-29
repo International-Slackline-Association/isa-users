@@ -18,20 +18,20 @@ export const getAllClubs = async (req: Request, res: Response) => {
 };
 
 export const getClubDetail = async (req: Request, res: Response) => {
-  const club = await db.getClub(req.user.email);
+  const club = await db.getClub(req.user.id);
   res.json(club);
 };
 
 export const updateClub = async (req: Request<any, any, UpdateClubPostBody>, res: Response) => {
   const { name, city, contactPhone, country, profilePictureUrl } = req.body;
-  const club = await validateClubExists(req.user.email);
+  const club = await validateClubExists(req.user.id);
   const updatedClub = assignExistingFields(club, { name, city, contactPhone, country, profilePictureUrl });
   await db.putClub(updatedClub);
   res.end();
 };
 
 export const getUsersOfClub = async (req: Request, res: Response) => {
-  const id = req.user.email;
+  const id = req.user.id;
   const usersOfClub = await db.getUsersOfClub(id);
   if (usersOfClub.length > 0) {
     const users = await db.getUsers(usersOfClub.map((u) => u.userId));
@@ -57,7 +57,7 @@ export const getUsersOfClub = async (req: Request, res: Response) => {
 };
 
 export const approveUserJoinRequest = async (req: Request, res: Response) => {
-  const clubId = req.user.email;
+  const clubId = req.user.id;
   const userId = req.params.userId;
   const userClub = await db.getUserClub(userId, clubId);
   if (userClub?.isPendingApproval) {
@@ -67,7 +67,7 @@ export const approveUserJoinRequest = async (req: Request, res: Response) => {
 };
 
 export const removeUser = async (req: Request, res: Response) => {
-  const clubId = req.user.email;
+  const clubId = req.user.id;
   const userId = req.params.userId;
   const userClub = await db.getUserClub(userId, clubId);
   if (userClub) {

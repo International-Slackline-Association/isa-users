@@ -14,8 +14,13 @@ const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DD
   SK_GSI: {
     compose: () => 'clubDetails',
   },
+
   GSI_SK: {
-    compose: () => 'clubDetails',
+    fields: ['email'],
+    compose: (params) => composeKey('email', params.email),
+    destruct: (key) => ({
+      email: destructKey(key, 1),
+    }),
   },
 });
 

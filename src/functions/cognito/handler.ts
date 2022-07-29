@@ -1,19 +1,19 @@
 import type { PostConfirmationTriggerHandler } from 'aws-lambda';
-import AWS from 'aws-sdk';
+import { cisProvider } from 'core/aws/clients';
 import * as db from 'core/db';
 import { logger } from 'core/logger';
-
-const cisProvider = new AWS.CognitoIdentityServiceProvider();
+import { generateIdFromEmail } from 'core/utils';
 
 logger.updateMeta({ lambdaName: 'cognito-trigger' });
 const cognitoTrigger: PostConfirmationTriggerHandler = async (event) => {
   try {
     if (event.triggerSource === 'PostConfirmation_ConfirmSignUp') {
       const { email, family_name, name, sub } = event.request.userAttributes;
+      const id = generateIdFromEmail(email);
       const isaMember = await db.getISAMember(email);
       if (isaMember) {
         await db.putClub({
-          clubId: email,
+          clubId: id,
           email: email,
           name: name,
           cognitoSub: sub,
@@ -21,7 +21,7 @@ const cognitoTrigger: PostConfirmationTriggerHandler = async (event) => {
         });
       } else {
         await db.putUser({
-          userId: email,
+          userId: id,
           email: email,
           name: name,
           surname: family_name,
@@ -36,6 +36,10 @@ const cognitoTrigger: PostConfirmationTriggerHandler = async (event) => {
             {
               Name: 'custom:identityType',
               Value: isaMember ? 'club' : 'individual',
+            },
+            {
+              Name: 'custom:ISA_ID',
+              Value: id,
             },
           ],
         })

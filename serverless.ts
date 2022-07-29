@@ -100,7 +100,19 @@ const serverlessConfiguration: AWS = {
               AttributeType: 'S',
             },
             {
+              AttributeName: 'LSI2',
+              AttributeType: 'S',
+            },
+            {
               AttributeName: 'GSI_SK',
+              AttributeType: 'S',
+            },
+            {
+              AttributeName: 'GSI2',
+              AttributeType: 'S',
+            },
+            {
+              AttributeName: 'GSI2_SK',
               AttributeType: 'S',
             },
           ],
@@ -116,7 +128,7 @@ const serverlessConfiguration: AWS = {
           ],
           LocalSecondaryIndexes: [
             {
-              IndexName: 'PK-LSI',
+              IndexName: 'LSI',
               KeySchema: [
                 { AttributeName: 'PK', KeyType: 'HASH' },
                 { AttributeName: 'LSI', KeyType: 'RANGE' },
@@ -125,10 +137,20 @@ const serverlessConfiguration: AWS = {
                 ProjectionType: 'ALL',
               },
             },
+            {
+              IndexName: 'LSI2',
+              KeySchema: [
+                { AttributeName: 'PK', KeyType: 'HASH' },
+                { AttributeName: 'LSI2', KeyType: 'RANGE' },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
+              },
+            },
           ],
           GlobalSecondaryIndexes: [
             {
-              IndexName: 'GSI-GSI_SK',
+              IndexName: 'GSI',
               KeySchema: [
                 { AttributeName: 'SK_GSI', KeyType: 'HASH' },
                 { AttributeName: 'GSI_SK', KeyType: 'RANGE' },
@@ -136,16 +158,19 @@ const serverlessConfiguration: AWS = {
               Projection: {
                 ProjectionType: 'ALL',
               },
-              ProvisionedThroughput: {
-                ReadCapacityUnits: 1,
-                WriteCapacityUnits: 1,
+            },
+            {
+              IndexName: 'GSI2',
+              KeySchema: [
+                { AttributeName: 'GSI2', KeyType: 'HASH' },
+                { AttributeName: 'GSI2_SK', KeyType: 'RANGE' },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
               },
             },
           ],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1,
-          },
+          BillingMode: 'PAY_PER_REQUEST',
         },
       },
       CloudWatchApplicationLogs: {

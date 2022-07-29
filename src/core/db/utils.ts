@@ -3,8 +3,10 @@ import { DDBTableKeyAttrs, TransformerParams } from 'core/db/types';
 
 export const TABLE_NAME = process.env.ISA_USERS_TABLE;
 export const INDEX_NAMES = {
-  GSI: 'GSI-GSI_SK',
-  LSI: 'PK-LSI',
+  LSI: 'LSI',
+  LSI2: 'LSI2',
+  GSI: 'GSI',
+  GSI2: 'GSI2',
 };
 
 export const transformUtils = <DDBItem, DDBAttrs extends DDBTableKeyAttrs>(
@@ -13,8 +15,11 @@ export const transformUtils = <DDBItem, DDBAttrs extends DDBTableKeyAttrs>(
   const keyFields: { [P in keyof DDBTableKeyAttrs]: P } = {
     PK: 'PK',
     SK_GSI: 'SK_GSI',
-    GSI_SK: 'GSI_SK',
     LSI: 'LSI',
+    LSI2: 'LSI2',
+    GSI_SK: 'GSI_SK',
+    GSI2: 'GSI2',
+    GSI2_SK: 'GSI2_SK',
   };
 
   const key = (params: Partial<Omit<DDBItem, keyof DDBAttrs>>) => {

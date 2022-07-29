@@ -15,7 +15,11 @@ const { key, attrsToItem, itemToAttrs } = transformUtils<DDBUserDetailItem, DDBU
     compose: () => 'userDetails',
   },
   GSI_SK: {
-    compose: () => 'userDetails',
+    fields: ['email'],
+    compose: (params) => composeKey('email', params.email),
+    destruct: (key) => ({
+      email: destructKey(key, 1),
+    }),
   },
 });
 

@@ -2,10 +2,10 @@ import { DDBTableKeyAttrs } from 'core/db/types';
 
 interface ParsedKeyAttrs {
   userId: string;
+  email: string;
 }
 interface NonKeyAttrs {
   cognitoSub: string;
-  email: string;
   name: string;
   surname: string;
   gender?: 'm' | 'f' | 'o';
