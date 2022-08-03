@@ -5,12 +5,12 @@ import { UpdateUserPostBody } from '@functions/api/endpoints/types';
 import { assignExistingFields } from 'core/utils';
 
 export const getUserDetails = async (req: Request, res: Response) => {
-  const user = await db.getUser(req.user.id);
+  const user = await db.getUser(req.user.isaId);
   res.json(user);
 };
 
 export const getClubsOfUser = async (req: Request, res: Response) => {
-  const userClubs = await db.getClubsOfUser(req.user.id);
+  const userClubs = await db.getClubsOfUser(req.user.isaId);
   if (userClubs.length > 0) {
     const clubs = await db.getClubs(userClubs.map((c) => c.clubId));
     const items = clubs
@@ -31,7 +31,7 @@ export const getClubsOfUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res: Response) => {
   const { name, surname, birthDate, city, country, emergencyContact, gender, phoneNumber, profilePictureUrl } =
     req.body;
-  const user = await validateUserExists(req.user.id);
+  const user = await validateUserExists(req.user.isaId);
   const updatedUser = assignExistingFields(user, {
     name,
     surname,
@@ -50,7 +50,7 @@ export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res
 
 export const joinClub = async (req: Request, res: Response) => {
   const clubId = req.params.id;
-  const { userId } = await validateUserExists(req.user.id);
+  const { userId } = await validateUserExists(req.user.isaId);
   const club = await validateClubExists(clubId);
   const userClub = await db.getUserClub(userId, clubId);
   if (!userClub) {
@@ -67,7 +67,7 @@ export const joinClub = async (req: Request, res: Response) => {
 
 export const leaveClub = async (req: Request, res: Response) => {
   const clubId = req.params.id;
-  await db.removeUserClub(req.user.id, clubId);
+  await db.removeUserClub(req.user.isaId, clubId);
   // TODO: Send email to club
   res.end();
 };

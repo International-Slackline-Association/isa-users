@@ -6,8 +6,9 @@ interface ParsedKeyAttrs {
 }
 interface NonKeyAttrs {
   cognitoSub: string;
-  name: string;
-  surname: string;
+  cognitoUsername: string;
+  name?: string;
+  surname?: string;
   gender?: 'm' | 'f' | 'o';
   birthDate?: string;
   phoneNumber?: string;

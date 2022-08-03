@@ -15,7 +15,7 @@ export const assignExistingFields = <T, U>(obj1: T, obj2: U): T => {
   return v;
 };
 
-export const generateIdFromEmail = (email: string) => {
-  const hash = crypto.createHash('sha256').update(email).digest('hex');
+export const generateISAIdFromUsername = (username: string) => {
+  const hash = crypto.createHash('sha256').update(username).digest('hex');
   return `ISA_${hash.substring(0, 8)}`.toUpperCase();
 };

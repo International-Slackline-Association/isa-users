@@ -17,7 +17,6 @@ const lambda: AWS['functions'][0] = {
             'X-Api-Key',
             'X-Amz-Security-Token',
             'X-Amz-User-Agent',
-            'x-isa-id',
           ],
         },
         authorizer: {

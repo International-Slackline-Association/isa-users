@@ -7,7 +7,8 @@ interface KeyAttrsParsed {
 
 interface NonKeyAttrs {
   cognitoSub: string;
-  name: string;
+  cognitoUsername: string;
+  name?: string;
   profilePictureUrl?: string;
   city?: string;
   country?: string;

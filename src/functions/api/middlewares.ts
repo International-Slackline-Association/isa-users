@@ -3,14 +3,15 @@ import { getCurrentInvoke } from '@vendia/serverless-express';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { logger } from 'core/logger';
-import { generateIdFromEmail } from 'core/utils';
+import { generateISAIdFromUsername } from 'core/utils';
 
 export const injectCommonlyUsedHeadersMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   const event = getCurrentInvoke().event as APIGatewayProxyEvent;
   const claims = event.requestContext.authorizer?.claims;
   if (claims) {
+    console.log(claims);
     req.user = {
-      id: generateIdFromEmail(claims.email),
+      isaId: generateISAIdFromUsername(claims['cognito:username']),
       // email: claims.email,
       // sub: claims.sub,
     };

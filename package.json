@@ -10,7 +10,8 @@
     "package": "serverless package",
     "deploy": "serverless deploy --verbose",
     "deploy:api": "serverless deploy function -f api",
-    "deploy:cognito": "serverless deploy function -f cognitoTrigger"
+    "deploy:cognito": "serverless deploy function -f cognitoTrigger",
+    "scripts:create-user": "ts-node misc/scripts/create-user.ts"
   },
   "engines": {
     "node": ">=16.13.2"

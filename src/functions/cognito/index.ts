@@ -12,6 +12,13 @@ const lambda: AWS['functions'][0] = {
         pool: 'isa-users',
       },
     },
+    {
+      cognitoUserPool: {
+        existing: true,
+        trigger: 'PreSignUp',
+        pool: 'isa-users',
+      },
+    },
   ],
   logRetentionInDays: 90,
 };
