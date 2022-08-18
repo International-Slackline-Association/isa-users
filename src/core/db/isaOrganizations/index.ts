@@ -1,9 +1,12 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
-import { DDBISAMemberAttrs, DDBISAMemberItem } from 'core/db/isaMembers/types';
+import { DDBISAOrganizationAttrs, DDBISAOrganizationItem } from 'core/db/isaOrganizations/types';
 import { composeKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
-const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DDBISAMemberItem, DDBISAMemberAttrs>({
+const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<
+  DDBISAOrganizationItem,
+  DDBISAOrganizationAttrs
+>({
   PK: {
     compose: () => 'isaMembers',
   },
@@ -13,13 +16,13 @@ const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DD
   },
 });
 
-export const getISAMember = async (email: string) => {
+export const getISAOrganization = async (email: string) => {
   return ddb
     .get({ TableName: TABLE_NAME, Key: key({ email }) })
     .promise()
     .then((data) => {
       if (data.Item) {
-        return attrsToItem(data.Item as DDBISAMemberAttrs);
+        return attrsToItem(data.Item as DDBISAOrganizationAttrs);
       }
       return null;
     });

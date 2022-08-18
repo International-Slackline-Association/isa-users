@@ -1,18 +1,21 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
-import { DDBClubAttrs, DDBClubItem } from 'core/db/club/types';
+import { DDBOrganizationAttrs, DDBOrganizationItem } from 'core/db/organization/types';
 import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
-const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DDBClubItem, DDBClubAttrs>({
+const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<
+  DDBOrganizationItem,
+  DDBOrganizationAttrs
+>({
   PK: {
-    fields: ['clubId'],
-    compose: (params) => composeKey('club', params.clubId),
+    fields: ['organizationId'],
+    compose: (params) => composeKey('org', params.organizationId),
     destruct: (key) => ({
-      clubId: destructKey(key, 1),
+      organizationId: destructKey(key, 1),
     }),
   },
   SK_GSI: {
-    compose: () => 'clubDetails',
+    compose: () => 'orgDetails',
   },
 
   GSI_SK: {
@@ -24,7 +27,7 @@ const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DD
   },
 });
 
-export const getAllClubs = async () => {
+export const getAllOrganizations = async () => {
   return ddb
     .query({
       TableName: TABLE_NAME,
@@ -40,38 +43,38 @@ export const getAllClubs = async () => {
     .promise()
     .then((data) => {
       const items = data.Items || [];
-      return items.map((i: DDBClubAttrs) => attrsToItem(i));
+      return items.map((i: DDBOrganizationAttrs) => attrsToItem(i));
     });
 };
 
-export const getClub = async (clubId: string) => {
+export const getOrganization = async (organizationId: string) => {
   return ddb
-    .get({ TableName: TABLE_NAME, Key: key({ clubId }) })
+    .get({ TableName: TABLE_NAME, Key: key({ organizationId: organizationId }) })
     .promise()
     .then((data) => {
       if (data.Item) {
-        return attrsToItem(data.Item as DDBClubAttrs);
+        return attrsToItem(data.Item as DDBOrganizationAttrs);
       }
       return null;
     });
 };
 
-export const getClubs = async (clubIds: string[]) => {
+export const getOrganizations = async (organizationIds: string[]) => {
   return ddb
     .batchGet({
       RequestItems: {
         [TABLE_NAME]: {
-          Keys: clubIds.map((id) => key({ clubId: id })),
+          Keys: organizationIds.map((id) => key({ organizationId: id })),
         },
       },
     })
     .promise()
     .then((data) => {
       const items = data.Responses[TABLE_NAME] || [];
-      return items.map((i: DDBClubAttrs) => attrsToItem(i));
+      return items.map((i: DDBOrganizationAttrs) => attrsToItem(i));
     });
 };
 
-export const putClub = async (club: DDBClubItem) => {
-  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
+export const putOrganization = async (organization: DDBOrganizationItem) => {
+  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }).promise();
 };

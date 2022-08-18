@@ -1,9 +1,12 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
-import { DDBUserClubAttrs, DDBUserClubItem } from 'core/db/user/clubs/types';
+import { DDBUserOrganizationAttrs, DDBUserOrganizationItem } from 'core/db/user/organizations/types';
 import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
-const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<DDBUserClubItem, DDBUserClubAttrs>({
+const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<
+  DDBUserOrganizationItem,
+  DDBUserOrganizationAttrs
+>({
   PK: {
     fields: ['userId'],
     compose: (params) => composeKey('user', params.userId),
@@ -12,10 +15,10 @@ const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<DD
     }),
   },
   SK_GSI: {
-    fields: ['clubId'],
-    compose: (params) => composeKey('club', params.clubId),
+    fields: ['organizationId'],
+    compose: (params) => composeKey('org', params.organizationId),
     destruct: (key) => ({
-      clubId: destructKey(key, 1),
+      organizationId: destructKey(key, 1),
     }),
   },
   GSI_SK: {
@@ -23,7 +26,7 @@ const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<DD
   },
 });
 
-export const getClubsOfUser = async (userId: string) => {
+export const getOrganizationsOfUser = async (userId: string) => {
   return ddb
     .query({
       TableName: TABLE_NAME,
@@ -40,11 +43,11 @@ export const getClubsOfUser = async (userId: string) => {
     .promise()
     .then((data) => {
       const items = data.Items || [];
-      return items.map((i: DDBUserClubAttrs) => attrsToItem(i));
+      return items.map((i: DDBUserOrganizationAttrs) => attrsToItem(i));
     });
 };
 
-export const getUsersOfClub = async (clubId: string) => {
+export const getUsersOfOrganization = async (organizationId: string) => {
   return ddb
     .query({
       TableName: TABLE_NAME,
@@ -54,48 +57,48 @@ export const getUsersOfClub = async (clubId: string) => {
         '#SK_GSI': keyFields.SK_GSI,
       },
       ExpressionAttributeValues: {
-        ':SK_GSI': keyUtils.SK_GSI.compose({ clubId }),
+        ':SK_GSI': keyUtils.SK_GSI.compose({ organizationId }),
       },
     })
     .promise()
     .then((data) => {
       const items = data.Items || [];
-      return items.map((i: DDBUserClubAttrs) => attrsToItem(i));
+      return items.map((i: DDBUserOrganizationAttrs) => attrsToItem(i));
     });
 };
 
-export const getUserClub = async (userId: string, clubId: string) => {
+export const getUserOrganization = async (userId: string, organizationId: string) => {
   return ddb
     .get({
       TableName: TABLE_NAME,
-      Key: key({ userId, clubId }),
+      Key: key({ userId, organizationId }),
     })
     .promise()
     .then((data) => {
       if (data.Item) {
-        return attrsToItem(data.Item as DDBUserClubAttrs);
+        return attrsToItem(data.Item as DDBUserOrganizationAttrs);
       }
       return null;
     });
 };
 
-export const putUserClub = async (club: DDBUserClubItem) => {
-  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
+export const putUserOrganization = async (organization: DDBUserOrganizationItem) => {
+  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }).promise();
 };
 
-export const updateUserClub = async (club: DDBUserClubItem) => {
-  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(club) }).promise();
+export const updateUserOrganization = async (organization: DDBUserOrganizationItem) => {
+  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }).promise();
 };
 
-export async function updateClubField<T extends keyof DDBUserClubItem>(
-  clubId: string,
+export async function updateOrganizationField<T extends keyof DDBUserOrganizationItem>(
+  organizationId: string,
   userId: string,
   field: T,
-  value: DDBUserClubItem[T],
+  value: DDBUserOrganizationItem[T],
 ) {
   const params: DocumentClient.UpdateItemInput = {
     TableName: TABLE_NAME,
-    Key: key({ userId, clubId }),
+    Key: key({ userId, organizationId }),
     UpdateExpression: `SET #field = :v`,
     ExpressionAttributeNames: {
       '#field': field,
@@ -107,6 +110,6 @@ export async function updateClubField<T extends keyof DDBUserClubItem>(
   return ddb.update(params).promise();
 }
 
-export const removeUserClub = async (userId: string, clubId: string) => {
-  return ddb.delete({ TableName: TABLE_NAME, Key: key({ clubId, userId }) }).promise();
+export const removeUserOrganization = async (userId: string, organizationId: string) => {
+  return ddb.delete({ TableName: TABLE_NAME, Key: key({ organizationId, userId }) }).promise();
 };

@@ -1,7 +1,7 @@
 import { DDBTableKeyAttrs } from 'core/db/types';
 
 interface KeyAttrsParsed {
-  clubId: string;
+  organizationId: string;
   email: string;
 }
 
@@ -12,9 +12,10 @@ interface NonKeyAttrs {
   profilePictureUrl?: string;
   city?: string;
   country?: string;
+  organizationType?: 'club' | 'other';
   memberType?: 'active' | 'observer' | 'partner';
   contactPhone?: string;
 }
 
-export type DDBClubItem = KeyAttrsParsed & NonKeyAttrs;
-export type DDBClubAttrs = DDBTableKeyAttrs & NonKeyAttrs;
+export type DDBOrganizationItem = KeyAttrsParsed & NonKeyAttrs;
+export type DDBOrganizationAttrs = DDBTableKeyAttrs & NonKeyAttrs;

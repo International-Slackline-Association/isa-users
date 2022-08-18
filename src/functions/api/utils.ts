@@ -15,10 +15,10 @@ export const validateUserExists = async (userId: string) => {
   return user;
 };
 
-export const validateClubExists = async (clubId: string) => {
-  const club = await db.getClub(clubId);
-  if (!club) {
-    throw new Error(`Club ${clubId} does not exist`);
+export const validateOrganizationExists = async (organizationId: string) => {
+  const organization = await db.getOrganization(organizationId);
+  if (!organization) {
+    throw new Error(`Organization ${organizationId} does not exist`);
   }
-  return club;
+  return organization;
 };

@@ -3,7 +3,7 @@ import cors from 'cors';
 
 import { injectCommonlyUsedHeadersMiddleware, errorMiddleware, notFoundMiddleware } from '@functions/api/middlewares';
 import { userApi } from '@functions/api/endpoints/user-api';
-import { clubApi } from '@functions/api/endpoints/club-api';
+import { organizationApi } from '@functions/api/endpoints/organization-api';
 
 const app = express();
 
@@ -19,7 +19,7 @@ const setupExpressApp = (app: Express) => {
 
 const setupRoutes = (app: Express) => {
   app.use('/user', userApi);
-  app.use('/club', clubApi);
+  app.use('/organization', organizationApi);
 };
 
 const registerStartingMiddlewares = (app: Express) => {

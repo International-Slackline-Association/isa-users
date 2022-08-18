@@ -26,10 +26,10 @@ const createUser = async (
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
   const isaId = generateISAIdFromUsername(username);
-  const isaMember = await db.getISAMember(attrs.email);
+  const isaMember = await db.getISAOrganization(attrs.email);
   if (isaMember) {
-    await db.putClub({
-      clubId: isaId,
+    await db.putOrganization({
+      organizationId: isaId,
       email: attrs.email,
       name: attrs.name,
       cognitoSub: attrs.sub,
@@ -53,7 +53,7 @@ const updateCognitoAttributes = async (
   userPoolId: string,
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
-  const isaMember = await db.getISAMember(attrs.email);
+  const isaOrganization = await db.getISAOrganization(attrs.email);
   await cisProvider
     .adminUpdateUserAttributes({
       UserPoolId: userPoolId,
@@ -61,7 +61,7 @@ const updateCognitoAttributes = async (
       UserAttributes: [
         {
           Name: 'custom:identityType',
-          Value: isaMember ? 'club' : 'individual',
+          Value: isaOrganization ? 'organization' : 'individual',
         },
       ],
     })

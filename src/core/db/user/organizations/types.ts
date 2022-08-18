@@ -2,7 +2,7 @@ import { DDBTableKeyAttrs } from 'core/db/types';
 
 interface KeyAttrsParsed {
   userId: string;
-  clubId: string;
+  organizationId: string;
 }
 
 interface NonKeyAttrs {
@@ -10,5 +10,5 @@ interface NonKeyAttrs {
   joinedAt?: string;
 }
 
-export type DDBUserClubItem = KeyAttrsParsed & NonKeyAttrs;
-export type DDBUserClubAttrs = DDBTableKeyAttrs & NonKeyAttrs;
+export type DDBUserOrganizationItem = KeyAttrsParsed & NonKeyAttrs;
+export type DDBUserOrganizationAttrs = DDBTableKeyAttrs & NonKeyAttrs;

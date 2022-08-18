@@ -7,7 +7,7 @@ interface Options {
   username: string;
   name: string;
   surname: string;
-  identityType?: 'club' | 'individual';
+  identityType?: 'organization' | 'individual';
 }
 
 const createUser = async (opts: Options) => {
@@ -41,4 +41,4 @@ const createUser = async (opts: Options) => {
     .promise();
 };
 
-createUser({ username: '', name: '', surname: '', identityType: 'club' });
+createUser({ username: '', name: '', surname: '', identityType: 'organization' });

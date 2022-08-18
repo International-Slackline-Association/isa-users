@@ -1,4 +1,4 @@
-export interface UpdateClubPostBody {
+export interface UpdateOrganizationPostBody {
   name: string;
   profilePictureUrl?: string;
   city?: string;
