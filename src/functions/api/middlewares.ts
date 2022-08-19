@@ -9,10 +9,9 @@ export const injectCommonlyUsedHeadersMiddleware = async (req: Request, _res: Re
   const event = getCurrentInvoke().event as APIGatewayProxyEvent;
   const claims = event.requestContext.authorizer?.claims;
   if (claims) {
-    console.log(claims);
     req.user = {
       isaId: generateISAIdFromUsername(claims['cognito:username']),
-      // email: claims.email,
+      email: claims.email,
       // sub: claims.sub,
     };
   }

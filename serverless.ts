@@ -50,6 +50,11 @@ const serverlessConfiguration: AWS = {
             Action: ['cognito-idp:AdminUpdateUserAttributes'],
             Resource: ['${ssm:isa-users-cognitoPoolArn}'],
           },
+          {
+            Effect: 'Allow',
+            Action: ['ssm:GetParameters', 'ssm:GetParameter', 'ssm:GetParametersByPath'],
+            Resource: 'arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/isa-users*',
+          },
         ],
       },
     },
