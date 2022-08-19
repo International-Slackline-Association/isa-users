@@ -9,7 +9,7 @@ export const getAllOrganizations = async (req: Request, res: Response) => {
   organizations.sort((a, b) => (a.name < b.name ? -1 : 1));
   res.json({
     items: organizations.map((c) => ({
-      id: c.organizationId,
+      organizationId: c.organizationId,
       name: c.name,
       email: c.email,
       profilePictureUrl: c.profilePictureUrl,
@@ -45,7 +45,7 @@ export const getUsersOfOrganization = async (req: Request, res: Response) => {
       .map((u) => {
         const userOrganization = usersOfOrganization.find((c) => c.userId === u.userId);
         return {
-          id: u.userId,
+          userId: u.userId,
           name: u.name,
           surname: u.surname,
           email: u.email,

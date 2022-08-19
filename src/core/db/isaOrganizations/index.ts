@@ -8,11 +8,11 @@ const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<
   DDBISAOrganizationAttrs
 >({
   PK: {
-    compose: () => 'isaMembers',
+    compose: () => 'isaOrganizations',
   },
   SK_GSI: {
     fields: ['email'],
-    compose: (params) => composeKey('member', params.email),
+    compose: (params) => composeKey('org', params.email),
   },
 });
 
