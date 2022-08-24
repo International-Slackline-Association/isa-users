@@ -41,4 +41,26 @@ const createUser = async (opts: Options) => {
     .promise();
 };
 
-createUser({ username: '', name: '', surname: '', identityType: 'organization' });
+const findArg = (args: string[], field: string) => {
+  const index = args.findIndex((arg) => arg.startsWith(field));
+  if (index !== -1) {
+    return args[index + 1];
+  }
+  return undefined;
+};
+
+const args = process.argv.slice(2);
+const email = findArg(args, '--email');
+const name = findArg(args, '--name');
+const surname = findArg(args, '--surname');
+const type = findArg(args, '--type');
+
+if (!email || !name || !surname || !type) {
+  throw new Error('Missing arguments');
+}
+
+if (type !== 'individual' && type !== 'organization') {
+  throw new Error('Wrong type');
+}
+
+createUser({ username: email, name, surname, identityType: type });
