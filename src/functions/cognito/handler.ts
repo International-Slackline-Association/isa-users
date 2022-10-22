@@ -10,8 +10,11 @@ const cognitoTrigger = async (event: PreSignUpTriggerEvent | PostConfirmationTri
     if (event.triggerSource === 'PreSignUp_AdminCreateUser') {
       await createUser(event.userName, event.request.userAttributes);
     }
-    if (event.triggerSource === 'PostConfirmation_ConfirmSignUp') {
+    if (event.triggerSource === 'PreSignUp_SignUp') {
       await createUser(event.userName, event.request.userAttributes);
+      event.response.autoConfirmUser = true;
+    }
+    if (event.triggerSource === 'PostConfirmation_ConfirmSignUp') {
       await updateCognitoAttributes(event.userName, event.userPoolId, event.request.userAttributes);
     }
     return event;
