@@ -35,7 +35,7 @@ const createUser = async (
       organizationId: isaId,
       email: attrs.email,
       name: attrs.name,
-      cognitoSub: attrs.sub,
+      cognitoSub: attrs.sub || username,
       cognitoUsername: username,
       memberType: isaMember.memberType,
     });
@@ -46,7 +46,7 @@ const createUser = async (
       name: attrs.name,
       surname: attrs.family_name,
       cognitoUsername: username,
-      cognitoSub: attrs.sub,
+      cognitoSub: attrs.sub || username,
     });
   }
 };
