@@ -27,10 +27,24 @@ export const getAllUserCertificates = async (isaId: string, isaEmail: string) =>
 
     const rowHeaders = rangeData[0];
     const rows = rangeData.slice(1);
-    const rowsOfUser = rows.filter((row) => row[0] === isaId || row[1] === isaEmail);
+    const rowsOfUser = rows.filter((row) => isSpreadsheetRowMatching(row, isaId, isaEmail));
     if (rowsOfUser.length > 0) {
       certificates.push({ range, headers: rowHeaders, values: rowsOfUser });
     }
   }
   return certificates;
+};
+
+const isSpreadsheetRowMatching = (rows: string[], isaId?: string, isaEmail?: string) => {
+  const rId = rows[0]?.toLowerCase();
+  const rEmail = rows[1]?.toLowerCase();
+
+  if (!rId && !rEmail) {
+    return false;
+  }
+
+  const id = isaId?.toLowerCase();
+  const email = isaEmail?.toLowerCase();
+
+  return rId === id || rEmail === email;
 };
