@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import api from '@functions/api';
 import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
+import verificationApi from '@functions/verification-api';
 
 const serverlessConfiguration: AWS = {
   service: 'isa-users',
@@ -60,7 +61,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger },
+  functions: { api, cognitoTrigger, logger, verificationApi },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -176,6 +177,10 @@ const serverlessConfiguration: AWS = {
             },
           ],
           BillingMode: 'PAY_PER_REQUEST',
+          TimeToLiveSpecification: {
+            AttributeName: 'ddb_ttl',
+            Enabled: 'TRUE',
+          },
         },
       },
       CloudWatchApplicationLogs: {

@@ -19,3 +19,8 @@ export const generateISAIdFromUsername = (username: string) => {
   const hash = crypto.createHash('sha256').update(username).digest('hex');
   return `ISA_${hash.substring(0, 8)}`.toUpperCase();
 };
+
+export const hashValue = (value: string) => {
+  const hash = crypto.createHash('sha256').update(value).digest('hex');
+  return hash.substring(0, 8);
+};

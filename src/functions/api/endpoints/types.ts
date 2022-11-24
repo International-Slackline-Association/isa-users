@@ -17,3 +17,8 @@ export interface UpdateUserPostBody {
   emergencyContact?: string;
   profilePictureUrl?: string;
 }
+
+export interface SignPayloadBody {
+  payload: any;
+  expiresInSeconds?: number;
+}
