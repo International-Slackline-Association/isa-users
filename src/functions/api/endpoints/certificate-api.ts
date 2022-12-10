@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
 import { catchExpressJsErrorWrapper } from '../utils';
-import { getAllUserCertificates } from 'core/certificates';
+import { getAllUserCertificatesFromSpreadsheet } from 'core/certificates';
 
 export const getAllCertificates = async (req: Request, res: Response) => {
-  const certificates = await getAllUserCertificates(req.user.isaId, req.user.email);
+  const certificates = await getAllUserCertificatesFromSpreadsheet(req.user.isaId, req.user.email);
   res.json({ items: certificates });
 };
 

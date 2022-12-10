@@ -1,5 +1,6 @@
 import type { PostConfirmationTriggerEvent, PreSignUpTriggerEvent, PostAuthenticationTriggerEvent } from 'aws-lambda';
-import { cisProvider } from 'core/aws/clients';
+import { cisProvider, ses } from 'core/aws/clients';
+import { getAllISAMembersFromSpreadsheet } from 'core/certificates';
 import * as db from 'core/db';
 import { logger } from 'core/logger';
 import { generateISAIdFromUsername } from 'core/utils';
@@ -29,15 +30,23 @@ const createUser = async (
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
   const isaId = generateISAIdFromUsername(username);
-  const isaMember = await db.getISAOrganization(attrs.email);
+  const isaMembers = await getAllISAMembersFromSpreadsheet();
+  const isaMember = isaMembers.find((member) => member.email === attrs.email);
   if (isaMember) {
+    await ses
+      .verifyEmailIdentity({ EmailAddress: attrs.email })
+      .promise()
+      .catch((error) => {
+        logger.error(error.message, { attrs });
+      });
+
     await db.putOrganization({
       organizationId: isaId,
       email: attrs.email,
       name: attrs.name,
       cognitoSub: attrs.sub || username,
       cognitoUsername: username,
-      memberType: isaMember.memberType,
+      memberType: isaMember.membership,
     });
   } else {
     await db.putUser({
@@ -56,7 +65,8 @@ const updateCognitoAttributes = async (
   userPoolId: string,
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
-  const isaOrganization = await db.getISAOrganization(attrs.email);
+  const isaMembers = await getAllISAMembersFromSpreadsheet();
+  const isaMember = isaMembers.find((member) => member.email === attrs.email);
   await cisProvider
     .adminUpdateUserAttributes({
       UserPoolId: userPoolId,
@@ -64,7 +74,7 @@ const updateCognitoAttributes = async (
       UserAttributes: [
         {
           Name: 'custom:identityType',
-          Value: isaOrganization ? 'organization' : 'individual',
+          Value: isaMember ? 'organization' : 'individual',
         },
       ],
     })

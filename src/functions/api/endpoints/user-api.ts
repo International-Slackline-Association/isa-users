@@ -3,6 +3,8 @@ import { catchExpressJsErrorWrapper, validateOrganizationExists, validateUserExi
 import * as db from 'core/db';
 import { UpdateUserPostBody } from '@functions/api/endpoints/types';
 import { assignExistingFields } from 'core/utils';
+import { sendEmail } from 'core/utils/email';
+import { userJoinNotificationEmailTemplate, userLeaveNotificationEmailTemplate } from 'core/utils/email/emailTypes';
 
 export const getUserDetails = async (req: Request, res: Response) => {
   const user = await db.getUser(req.user.isaId);
@@ -50,7 +52,7 @@ export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res
 
 export const joinOrganization = async (req: Request, res: Response) => {
   const organizationId = req.params.id;
-  const { userId } = await validateUserExists(req.user.isaId);
+  const { userId, name, surname } = await validateUserExists(req.user.isaId);
   const organization = await validateOrganizationExists(organizationId);
   const userOrganization = await db.getUserOrganization(userId, organizationId);
   if (!userOrganization) {
@@ -61,14 +63,23 @@ export const joinOrganization = async (req: Request, res: Response) => {
       joinedAt: new Date().toISOString(),
     });
   }
-  // TODO: Send email to organization
+
+  const { html, subject } = userJoinNotificationEmailTemplate(name, surname);
+  await sendEmail({ address: organization.email, subject, html });
+
   res.end();
 };
 
 export const leaveOrganization = async (req: Request, res: Response) => {
   const organizationId = req.params.id;
+  const { name, surname } = await validateUserExists(req.user.isaId);
+  const organization = await validateOrganizationExists(organizationId);
+
   await db.removeUserOrganization(req.user.isaId, organizationId);
-  // TODO: Send email to organization
+
+  const { html, subject } = userLeaveNotificationEmailTemplate(name, surname);
+  await sendEmail({ address: organization.email, subject, html });
+
   res.end();
 };
 

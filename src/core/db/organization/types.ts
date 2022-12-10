@@ -13,7 +13,7 @@ interface NonKeyAttrs {
   city?: string;
   country?: string;
   organizationType?: 'club' | 'other';
-  memberType?: 'active' | 'observer' | 'partner';
+  memberType?: string;
   contactPhone?: string;
 }
 

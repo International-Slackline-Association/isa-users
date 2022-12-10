@@ -56,6 +56,11 @@ const serverlessConfiguration: AWS = {
             Action: ['ssm:GetParameters', 'ssm:GetParameter', 'ssm:GetParametersByPath'],
             Resource: 'arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/isa-users*',
           },
+          {
+            Effect: 'Allow',
+            Action: ['ses:VerifyEmailIdentity', 'ses:SendEmail'],
+            Resource: '*',
+          },
         ],
       },
     },

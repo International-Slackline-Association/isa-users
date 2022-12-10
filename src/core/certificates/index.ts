@@ -1,6 +1,6 @@
 import { getValues } from 'core/certificates/spreadsheet';
 
-const ranges = [
+const allRanges = [
   'Instructors',
   'Riggers',
   'Athletic Award(Contest)',
@@ -12,8 +12,10 @@ const ranges = [
   'Approved Gear',
 ];
 
-export const getAllUserCertificates = async (isaId: string, isaEmail: string) => {
-  const valueRanges = await getValues(ranges);
+const membershipRange = ['ISA Membership'];
+
+export const getAllUserCertificatesFromSpreadsheet = async (isaId: string, isaEmail: string) => {
+  const valueRanges = await getValues(allRanges);
 
   const certificates: {
     range: string;
@@ -33,6 +35,30 @@ export const getAllUserCertificates = async (isaId: string, isaEmail: string) =>
     }
   }
   return certificates;
+};
+
+export const getAllISAMembersFromSpreadsheet = async () => {
+  const valueRanges = await getValues(membershipRange);
+
+  const isaMembers: {
+    email: string;
+    membership: string;
+    name: string;
+  }[] = [];
+
+  for (const valueRange of valueRanges) {
+    const range = valueRange.range;
+    const rangeData = valueRange.values;
+
+    const rows = rangeData.slice(1);
+    for (const row of rows) {
+      const email = row[1]?.toLowerCase();
+      const membership = row[2]?.toLowerCase();
+      const name = row[3]?.toLowerCase();
+      isaMembers.push({ email, membership, name });
+    }
+  }
+  return isaMembers;
 };
 
 const isSpreadsheetRowMatching = (rows: string[], isaId?: string, isaEmail?: string) => {
