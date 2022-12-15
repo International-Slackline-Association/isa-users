@@ -4,7 +4,7 @@ import publicKey from '../__static/verificationPublicKey';
 
 const jwtSecretSSMParameter = 'isa-users-rsa-private-key';
 
-export const signJWT = async (payload: Record<string, any>, opts: SignOptions) => {
+export const signJWT = async (payload: Record<string, any> , opts: SignOptions) => {
   const ssmParam = await ssm.getParameters({ Names: [jwtSecretSSMParameter] }).promise();
   const jwtPrivateKey = ssmParam.Parameters[0].Value;
 
@@ -12,7 +12,7 @@ export const signJWT = async (payload: Record<string, any>, opts: SignOptions) =
   return token;
 };
 
-export const verifyJWT = async (token: string) => {
+export const verifyJWT = (token: string) => {
   const payload = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
   return payload;
 };

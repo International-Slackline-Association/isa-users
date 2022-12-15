@@ -5,6 +5,7 @@ import { UpdateUserPostBody } from '@functions/api/endpoints/types';
 import { assignExistingFields } from 'core/utils';
 import { sendEmail } from 'core/utils/email';
 import { userJoinNotificationEmailTemplate, userLeaveNotificationEmailTemplate } from 'core/utils/email/emailTypes';
+import { createVerifiableDocument } from 'core/documentVerification';
 
 export const getUserDetails = async (req: Request, res: Response) => {
   const user = await db.getUser(req.user.isaId);
@@ -70,6 +71,30 @@ export const joinOrganization = async (req: Request, res: Response) => {
   res.end();
 };
 
+export const getOrganizationMembershipDocument = async (req: Request, res: Response) => {
+  const organizationId = req.params.id;
+  const { userId, name, surname } = await validateUserExists(req.user.isaId);
+  const organization = await validateOrganizationExists(organizationId);
+  const userOrganization = await db.getUserOrganization(userId, organizationId);
+  if (!userOrganization) {
+    throw new Error('User is not a member of this organization');
+  }
+  const expiresInSeconds = 60 * 60 * 24 * 7;
+  const { id, token, verificationUrl, expiresAt } = await createVerifiableDocument({
+    subject: `${name} ${surname}`,
+    expiresInSeconds: expiresInSeconds,
+    createHash: false,
+    content: `"${name} ${surname}" is an approved member of "${organization.name}"`,
+  });
+
+  res.json({
+    id,
+    token,
+    verificationUrl,
+    expiresAt,
+  });
+};
+
 export const leaveOrganization = async (req: Request, res: Response) => {
   const organizationId = req.params.id;
   const { name, surname } = await validateUserExists(req.user.isaId);
@@ -89,3 +114,4 @@ userApi.put('/details', catchExpressJsErrorWrapper(updateUser));
 userApi.get('/organizations', catchExpressJsErrorWrapper(getOrganizationsOfUser));
 userApi.post('/organization/:id/join', catchExpressJsErrorWrapper(joinOrganization));
 userApi.delete('/organization/:id', catchExpressJsErrorWrapper(leaveOrganization));
+userApi.get('/organization/:id/membershipDocument', catchExpressJsErrorWrapper(getOrganizationMembershipDocument));
