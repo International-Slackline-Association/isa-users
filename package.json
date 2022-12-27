@@ -12,6 +12,7 @@
     "deploy:api": "serverless deploy function -f api",
     "deploy:cognito": "serverless deploy function -f cognitoTrigger",
     "deploy:verification-api": "serverless deploy function -f verificationApi",
+    "deploy:public-api": "serverless deploy function -f publicApi",
     "scripts:create-user": "ts-node misc/scripts/create-user.ts"
   },
   "engines": {

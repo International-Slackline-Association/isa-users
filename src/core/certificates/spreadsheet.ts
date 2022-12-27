@@ -1,6 +1,17 @@
 import { ssm } from 'core/aws/clients';
 import { google, sheets_v4 } from 'googleapis';
 
+export type CertificateType =
+  | 'Instructors'
+  | 'Riggers'
+  | 'Athletic Award(Contest)'
+  | 'Athlete Certificate Of Exellence(Year)'
+  | 'Contest Organizer'
+  | 'ISA Membership'
+  | 'World Records'
+  | 'Honorary Members'
+  | 'Approved Gear';
+
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 const googleCredsSSMParameter = 'isa-users-google-credentials-json';
 const spreadsheetIdSSMParameter = 'isa-users-certificates-spreadsheetId';
@@ -31,7 +42,7 @@ const authorize = async () => {
   }
 };
 
-export const getValues = async (ranges: string[]) => {
+export const getValues = async (ranges: CertificateType[]) => {
   await authorize();
   const { spreadsheetId } = await loadSSMParameters();
 

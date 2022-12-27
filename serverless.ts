@@ -4,6 +4,7 @@ import api from '@functions/api';
 import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
 import verificationApi from '@functions/verification-api';
+import publicApi from '@functions/public-api';
 
 const serverlessConfiguration: AWS = {
   service: 'isa-users',
@@ -66,7 +67,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger, verificationApi },
+  functions: { api, cognitoTrigger, logger, verificationApi, publicApi },
   package: { individually: true },
   custom: {
     esbuild: {
