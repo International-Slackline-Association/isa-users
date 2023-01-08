@@ -5,6 +5,7 @@ import { injectCommonlyUsedHeadersMiddleware, errorMiddleware, notFoundMiddlewar
 import { userApi } from '@functions/api/endpoints/user-api';
 import { organizationApi } from '@functions/api/endpoints/organization-api';
 import { certificateApi } from '@functions/api/endpoints/certificate-api';
+import { basicApi } from './endpoints/basic-api';
 
 const app = express();
 
@@ -19,6 +20,7 @@ const setupExpressApp = (app: Express) => {
 };
 
 const setupRoutes = (app: Express) => {
+  app.use('/basic', basicApi);
   app.use('/user', userApi);
   app.use('/organization', organizationApi);
   app.use('/certificate', certificateApi);
