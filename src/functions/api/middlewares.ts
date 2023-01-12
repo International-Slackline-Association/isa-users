@@ -9,10 +9,14 @@ export const injectCommonlyUsedHeadersMiddleware = async (req: Request, _res: Re
   const event = getCurrentInvoke().event as APIGatewayProxyEvent;
   const claims = event.requestContext.authorizer?.claims;
   if (claims) {
+    if (!claims['cognito:username'] && claims.scope === 'default/user default/organization') {
+      claims['cognito:username'] = req.headers['x-cognito-username'];
+    }
     req.user = {
-      isaId: generateISAIdFromUsername(claims['cognito:username']),
+      isaId: claims['cognito:username'] && generateISAIdFromUsername(claims['cognito:username']),
       email: claims.email,
-      // sub: claims.sub,
+      scope: claims.scope,
+      sub: claims.sub,
     };
   }
   next();
@@ -38,5 +42,6 @@ export const errorMiddleware: ErrorRequestHandler = async (error, req, res, next
 };
 
 export const notFoundMiddleware = (_req: Request, res: Response, _next: NextFunction) => {
-  res.status(404).json({ message: '404 Not Found' });
+  console.log(_req.path);
+  res.status(404).json({ message: `${_req.path} Not Found` });
 };

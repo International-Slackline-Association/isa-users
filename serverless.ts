@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import api from '@functions/api';
+import apiCustomScopes from '@functions/api/scopedLambda';
 import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
 import verificationApi from '@functions/verification-api';
@@ -67,7 +68,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger, verificationApi, publicApi },
+  functions: { api, cognitoTrigger, logger, verificationApi, publicApi, apiCustomScopes },
   package: { individually: true },
   custom: {
     esbuild: {

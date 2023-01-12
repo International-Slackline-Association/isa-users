@@ -6,9 +6,11 @@ import { DDBOrganizationItem } from 'core/db/organization/types';
 
 export const getUserDetails = async (req: Request, res: Response) => {
   let details: DDBUserDetailItem | DDBOrganizationItem;
+  let identityType = 'individual';
   details = await db.getUser(req.user.isaId);
   if (!details) {
     details = await db.getOrganization(req.user.isaId);
+    identityType = 'organization';
   }
 
   if (!details) {
@@ -20,6 +22,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
     surname: details['surname'],
     email: details.email,
     profilePictureUrl: details.profilePictureUrl,
+    identityType: identityType,
   };
 
   res.json(response);
