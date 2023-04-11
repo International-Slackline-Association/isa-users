@@ -15,6 +15,7 @@ interface NonKeyAttrs {
   organizationType?: 'club' | 'other';
   memberType?: string;
   contactPhone?: string;
+  createdDateTime?: string;
 }
 
 export type DDBOrganizationItem = KeyAttrsParsed & NonKeyAttrs;

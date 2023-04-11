@@ -47,6 +47,7 @@ const createUser = async (
       cognitoSub: attrs.sub || username,
       cognitoUsername: username,
       memberType: isaMember.membership,
+      createdDateTime: new Date().toISOString(),
     });
   } else {
     await db.putUser({
@@ -56,6 +57,7 @@ const createUser = async (
       surname: attrs.family_name,
       cognitoUsername: username,
       cognitoSub: attrs.sub || username,
+      createdDateTime: new Date().toISOString(),
     });
   }
 };

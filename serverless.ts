@@ -193,7 +193,7 @@ const serverlessConfiguration: AWS = {
       CloudWatchApplicationLogs: {
         Type: 'AWS::Logs::LogGroup',
         Properties: {
-          LogGroupName: 'isa-users/ApplicationLogs',
+          LogGroupName: 'isa-users/applicationLogs',
           RetentionInDays: 90,
         },
       },
