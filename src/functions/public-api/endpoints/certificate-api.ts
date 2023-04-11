@@ -1,14 +1,14 @@
 import express, { Request, Response } from 'express';
 import { catchExpressJsErrorWrapper } from '../utils';
-import { getAllInstructorsFromSpreadsheet, getAllRiggersFromSpreadsheet } from 'core/certificates';
+import { getInstructorsFromSpreadsheet, getRiggersFromSpreadsheet } from 'core/certificates';
 
 export const getAllInstructorCertificates = async (req: Request, res: Response) => {
-  const instructors = await getAllInstructorsFromSpreadsheet();
+  const instructors = await getInstructorsFromSpreadsheet();
   res.json({ items: instructors });
 };
 
 export const getAllRiggerCertificates = async (req: Request, res: Response) => {
-  const riggers = await getAllRiggersFromSpreadsheet();
+  const riggers = await getRiggersFromSpreadsheet();
   res.json({ items: riggers });
 };
 

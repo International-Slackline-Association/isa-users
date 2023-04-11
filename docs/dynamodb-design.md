@@ -3,5 +3,4 @@
 | user:{id}        | userDetails |     |       | email:{email} |      |         | ...            |
 | user:{id}        | org:{id}    |     |       | details       |      |         | ...            |
 | org:{id}         | orgDetails  |     |       | email:{email} |      |         | ...            |
-| isaOrganizations | org:{email} |     |       |               |      |         | ....           |
 | genericHashes    | {hash}      |     |       |               |      |         | ddb_ttl, value |

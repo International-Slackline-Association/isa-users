@@ -71,7 +71,6 @@ export const getVerifiableDocument = async (id?: string, token?: string) => {
   }
   try {
     const { iss, payload, iat, exp, sub } = verifyJWT(signedContent) as JwtPayload;
-    console.log(exp, iat);
     return {
       issuer: iss,
       subject: sub,
