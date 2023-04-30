@@ -7,6 +7,10 @@ import logger from '@functions/logger';
 import verificationApi from '@functions/verification-api';
 import publicApi from '@functions/public-api';
 
+import { dynamodbResources } from 'infrastructure/dynamodb';
+import { cloudwatchResources } from 'infrastructure/cloudwatch';
+import { backupResources } from 'infrastructure/backup';
+
 const serverlessConfiguration: AWS = {
   service: 'isa-users',
   frameworkVersion: '3',
@@ -95,108 +99,9 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      UsersTable: {
-        Type: 'AWS::DynamoDB::Table',
-        Properties: {
-          TableName: 'isa-users',
-          AttributeDefinitions: [
-            {
-              AttributeName: 'PK',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'SK_GSI',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'LSI',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'LSI2',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'GSI_SK',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'GSI2',
-              AttributeType: 'S',
-            },
-            {
-              AttributeName: 'GSI2_SK',
-              AttributeType: 'S',
-            },
-          ],
-          KeySchema: [
-            {
-              AttributeName: 'PK',
-              KeyType: 'HASH',
-            },
-            {
-              AttributeName: 'SK_GSI',
-              KeyType: 'RANGE',
-            },
-          ],
-          LocalSecondaryIndexes: [
-            {
-              IndexName: 'LSI',
-              KeySchema: [
-                { AttributeName: 'PK', KeyType: 'HASH' },
-                { AttributeName: 'LSI', KeyType: 'RANGE' },
-              ],
-              Projection: {
-                ProjectionType: 'ALL',
-              },
-            },
-            {
-              IndexName: 'LSI2',
-              KeySchema: [
-                { AttributeName: 'PK', KeyType: 'HASH' },
-                { AttributeName: 'LSI2', KeyType: 'RANGE' },
-              ],
-              Projection: {
-                ProjectionType: 'ALL',
-              },
-            },
-          ],
-          GlobalSecondaryIndexes: [
-            {
-              IndexName: 'GSI',
-              KeySchema: [
-                { AttributeName: 'SK_GSI', KeyType: 'HASH' },
-                { AttributeName: 'GSI_SK', KeyType: 'RANGE' },
-              ],
-              Projection: {
-                ProjectionType: 'ALL',
-              },
-            },
-            {
-              IndexName: 'GSI2',
-              KeySchema: [
-                { AttributeName: 'GSI2', KeyType: 'HASH' },
-                { AttributeName: 'GSI2_SK', KeyType: 'RANGE' },
-              ],
-              Projection: {
-                ProjectionType: 'ALL',
-              },
-            },
-          ],
-          BillingMode: 'PAY_PER_REQUEST',
-          TimeToLiveSpecification: {
-            AttributeName: 'ddb_ttl',
-            Enabled: 'TRUE',
-          },
-        },
-      },
-      CloudWatchApplicationLogs: {
-        Type: 'AWS::Logs::LogGroup',
-        Properties: {
-          LogGroupName: 'isa-users/applicationLogs',
-          RetentionInDays: 90,
-        },
-      },
+      ...dynamodbResources,
+      ...cloudwatchResources,
+      ...backupResources,
     },
   },
 };
