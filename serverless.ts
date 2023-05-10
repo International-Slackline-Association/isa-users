@@ -103,6 +103,24 @@ const serverlessConfiguration: AWS = {
       ...cloudwatchResources,
       ...backupResources,
     },
+    Outputs: {
+      UsersTable: {
+        Value: {
+          Ref: 'UsersTable',
+        },
+        Export: {
+          Name: 'UsersTable-Name',
+        },
+      },
+      UsersTableArn: {
+        Value: {
+          'Fn::GetAtt': ['UsersTable', 'Arn'],
+        },
+        Export: {
+          Name: 'UsersTable-Arn',
+        },
+      },
+    },
   },
 };
 
