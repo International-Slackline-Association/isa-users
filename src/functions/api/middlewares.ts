@@ -9,14 +9,9 @@ export const injectCommonlyUsedHeadersMiddleware = async (req: Request, _res: Re
   const event = getCurrentInvoke().event as APIGatewayProxyEvent;
   const claims = event.requestContext.authorizer?.claims;
   if (claims) {
-    let isaId = '';
-    if (!claims['x-isa-id'] && claims.scope === 'default/user default/organization') {
-      isaId = req.headers['x-isa-id'] as string; // this scope has privilege to behave as any user. We trust the client (ex: slackmap server)
-    }
     req.user = {
-      isaId: isaId || (claims['cognito:username'] && generateISAIdFromUsername(claims['cognito:username'])),
+      isaId: claims['cognito:username'] && generateISAIdFromUsername(claims['cognito:username']),
       email: claims.email,
-      scope: claims.scope,
       sub: claims.sub,
     };
   }

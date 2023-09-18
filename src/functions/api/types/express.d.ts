@@ -6,7 +6,6 @@ declare global {
       user: {
         isaId: string;
         email: string;
-        scope: string;
         sub: string;
       };
     }
