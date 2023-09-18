@@ -1,7 +1,7 @@
 import type { PostConfirmationTriggerEvent, PreSignUpTriggerEvent, PostAuthenticationTriggerEvent } from 'aws-lambda';
 import { cisProvider, ses } from 'core/aws/clients';
-import { getAllISAMembersFromSpreadsheet } from 'core/certificates';
 import * as db from 'core/db';
+import { slacklineDataApi } from 'core/external-api/slackline-data-api';
 import { logger } from 'core/logger';
 import { generateISAIdFromUsername } from 'core/utils';
 
@@ -30,7 +30,7 @@ const createUser = async (
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
   const isaId = generateISAIdFromUsername(username);
-  const isaMembers = await getAllISAMembersFromSpreadsheet();
+  const isaMembers = await slacklineDataApi.getIsaMembersList();
   const isaMember = isaMembers.find((member) => member.email === attrs.email);
   if (isaMember) {
     await ses
@@ -46,7 +46,7 @@ const createUser = async (
       name: attrs.name,
       cognitoSub: attrs.sub || username,
       cognitoUsername: username,
-      memberType: isaMember.membership,
+      memberType: isaMember.memberType,
       createdDateTime: new Date().toISOString(),
     });
   } else {
@@ -67,7 +67,7 @@ const updateCognitoAttributes = async (
   userPoolId: string,
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
-  const isaMembers = await getAllISAMembersFromSpreadsheet();
+  const isaMembers = await slacklineDataApi.getIsaMembersList();
   const isaMember = isaMembers.find((member) => member.email === attrs.email);
   await cisProvider
     .adminUpdateUserAttributes({

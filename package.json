@@ -14,7 +14,9 @@
     "deploy:cognito": "serverless deploy function -f cognitoTrigger",
     "deploy:verification-api": "serverless deploy function -f verificationApi",
     "deploy:public-api": "serverless deploy function -f publicApi",
-    "scripts:create-user": "ts-node misc/scripts/create-user.ts"
+    "scripts:create-user": "ts-node misc/scripts/create-user.ts",
+    "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts",
+    "scripts:listUnverifiedUsers": "ts-node misc/scripts/listUnverifiedUsers.ts"
   },
   "engines": {
     "node": ">=16.13.2"
@@ -33,12 +35,14 @@
     "@serverless/typescript": "3.19.0",
     "@types/aws-lambda": "8.10.100",
     "@types/dateformat": "5.0.0",
+    "@types/dotenv": "8.2.0",
     "@types/express": "4.17.13",
     "@types/jsonwebtoken": "8.5.9",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/node": "16.0.0",
     "@typescript-eslint/eslint-plugin": "5.28.0",
     "@typescript-eslint/parser": "5.28.0",
+    "dotenv": "16.3.1",
     "esbuild": "0.14.46",
     "eslint": "8.18.0",
     "eslint-config-prettier": "8.5.0",
