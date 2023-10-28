@@ -15,7 +15,7 @@
     "deploy:public-api": "serverless deploy function -f publicApi",
     "scripts:create-user": "ts-node misc/scripts/create-user.ts",
     "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts",
-    "scripts:listUnverifiedUsers": "ts-node misc/scripts/listUnverifiedUsers.ts"
+    "scripts:remindUnverifiedUsers": "ts-node misc/scripts/remindUnverifiedUsers.ts"
   },
   "engines": {
     "node": ">=16.13.2"

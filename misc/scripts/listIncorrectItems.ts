@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 import { ddb } from 'core/aws/clients';
 import dotenv from 'dotenv';
 import config from '../config.json';
-import { getAllCognitoUsers } from './listUnverifiedUsers';
+import { getAllCognitoUsers } from './remindUnverifiedUsers';
 
 export const cisProvider = new AWS.CognitoIdentityServiceProvider();
 

@@ -33,17 +33,10 @@ const createUser = async (
   const isaMembers = await slacklineDataApi.getIsaMembersList();
   const isaMember = isaMembers.find((member) => member.email === attrs.email);
   if (isaMember) {
-    await ses
-      .verifyEmailIdentity({ EmailAddress: attrs.email })
-      .promise()
-      .catch((error) => {
-        logger.error(error.message, { attrs });
-      });
-
     await db.putOrganization({
       organizationId: isaId,
       email: attrs.email,
-      name: attrs.name,
+      name: isaMember.name || attrs.name,
       cognitoSub: attrs.sub || username,
       cognitoUsername: username,
       memberType: isaMember.memberType,

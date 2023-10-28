@@ -1,15 +1,6 @@
 import { ses } from 'core/aws/clients';
 import { logger } from 'core/logger';
 
-export const addEmailToSES = async (email: string) => {
-  await ses
-    .verifyEmailIdentity({ EmailAddress: email })
-    .promise()
-    .catch((error) => {
-      logger.error(error.message, { email });
-    });
-};
-
 export const sendEmail = async (opts: { address: string; subject: string; html: string; replyTo?: string }) => {
   const { address, subject, html, replyTo } = opts;
   await ses
