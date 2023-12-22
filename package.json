@@ -13,6 +13,7 @@
     "deploy:cognito": "serverless deploy function -f cognitoTrigger",
     "deploy:verification-api": "serverless deploy function -f verificationApi",
     "deploy:public-api": "serverless deploy function -f publicApi",
+    "invoke:migrations": "serverless invoke local -f migrations",
     "scripts:create-user": "ts-node misc/scripts/create-user.ts",
     "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts",
     "scripts:remindUnverifiedUsers": "ts-node misc/scripts/remindUnverifiedUsers.ts"

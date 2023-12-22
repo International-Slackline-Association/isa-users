@@ -1,11 +1,12 @@
 import express, { Request, Response } from 'express';
 import { catchExpressJsErrorWrapper, validateOrganizationExists, validateUserExists } from '../utils';
 import * as db from 'core/db';
-import { UpdateUserPostBody } from '@functions/api/endpoints/types';
+import { UpdateProfilePicturePostBody, UpdateUserPostBody } from '@functions/api/endpoints/types';
 import { assignExistingFields } from 'core/utils';
 import { sendEmail } from 'core/utils/email';
 import { userJoinNotificationEmailTemplate, userLeaveNotificationEmailTemplate } from 'core/utils/email/emailTypes';
 import { createVerifiableDocument } from 'core/documentVerification';
+import { processAndPutProfilePhoto } from 'core/utils/images-processing';
 
 export const getUserDetails = async (req: Request, res: Response) => {
   const user = await db.getUser(req.user.isaId);
@@ -32,8 +33,7 @@ export const getOrganizationsOfUser = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res: Response) => {
-  const { name, surname, birthDate, city, country, emergencyContact, gender, phoneNumber, profilePictureUrl } =
-    req.body;
+  const { name, surname, birthDate, city, country, emergencyContact, gender, phoneNumber } = req.body;
   const user = await validateUserExists(req.user.isaId);
   const updatedUser = assignExistingFields(user, {
     name,
@@ -44,11 +44,22 @@ export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res
     emergencyContact,
     gender,
     phoneNumber,
-    profilePictureUrl,
   });
   await db.putUser(updatedUser);
+  res.json({});
+};
 
-  res.end();
+export const updateUserProfilePicture = async (req: Request<any, any, UpdateProfilePicturePostBody>, res: Response) => {
+  const user = await validateUserExists(req.user.isaId);
+  if (!req.body.processingBucketKey) {
+    delete user.profilePictureS3Key;
+    await db.putUser(user);
+  } else {
+    const { s3Key } = await processAndPutProfilePhoto(req.body.processingBucketKey, req.user.isaId);
+    user.profilePictureS3Key = s3Key;
+    await db.putUser(user);
+  }
+  res.json({});
 };
 
 export const joinOrganization = async (req: Request, res: Response) => {
@@ -111,6 +122,7 @@ export const leaveOrganization = async (req: Request, res: Response) => {
 export const userApi = express.Router();
 userApi.get('/details', catchExpressJsErrorWrapper(getUserDetails));
 userApi.put('/details', catchExpressJsErrorWrapper(updateUser));
+userApi.put('/profilePicture', catchExpressJsErrorWrapper(updateUserProfilePicture));
 userApi.get('/organizations', catchExpressJsErrorWrapper(getOrganizationsOfUser));
 userApi.post('/organization/:id/join', catchExpressJsErrorWrapper(joinOrganization));
 userApi.delete('/organization/:id', catchExpressJsErrorWrapper(leaveOrganization));

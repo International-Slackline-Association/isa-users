@@ -1,6 +1,5 @@
 export interface UpdateOrganizationPostBody {
   name: string;
-  profilePictureUrl?: string;
   city?: string;
   country?: string;
   contactPhone?: string;
@@ -15,5 +14,8 @@ export interface UpdateUserPostBody {
   city?: string;
   country?: string;
   emergencyContact?: string;
-  profilePictureUrl?: string;
+}
+
+export interface UpdateProfilePicturePostBody {
+  processingBucketKey: string | null;
 }

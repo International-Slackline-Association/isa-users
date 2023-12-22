@@ -5,10 +5,12 @@ import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
 import verificationApi from '@functions/verification-api';
 import publicApi from '@functions/public-api';
+import migrations from '@functions/migrations';
 
 import { dynamodbResources } from 'infrastructure/dynamodb';
 import { cloudwatchResources } from 'infrastructure/cloudwatch';
 import { backupResources } from 'infrastructure/backup';
+import { s3Resources } from 'infrastructure/s3';
 
 const serverlessConfiguration: AWS = {
   service: 'isa-users',
@@ -29,6 +31,8 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ISA_USERS_TABLE: { Ref: 'UsersTable' },
       APPLICATION_LOG_GROUP_NAME: { Ref: 'CloudWatchApplicationLogs' },
+      ISA_DOCUMENTS_IMAGE_PROCESSING_API_KEY: '${ssm:/isa-documents-image-processing-api-key}',
+      ISA_USERS_IMAGES_S3_BUCKET: { Ref: 'IsaUsersImagesS3Bucket' },
     },
     iam: {
       role: {
@@ -59,19 +63,31 @@ const serverlessConfiguration: AWS = {
           {
             Effect: 'Allow',
             Action: ['ssm:GetParameters', 'ssm:GetParameter', 'ssm:GetParametersByPath'],
-            Resource: 'arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/isa-users*',
+            Resource: [
+              'arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/isa-users*',
+              'arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/isa-documents*',
+            ],
           },
           {
             Effect: 'Allow',
             Action: ['ses:VerifyEmailIdentity', 'ses:SendEmail'],
             Resource: '*',
           },
+          {
+            Effect: 'Allow',
+            Action: ['s3:*'],
+            Resource: [
+              {
+                'Fn::Join': ['', [{ 'Fn::GetAtt': ['IsaUsersImagesS3Bucket', 'Arn'] }, '*']],
+              },
+            ],
+          },
         ],
       },
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger, verificationApi, publicApi },
+  functions: { api, cognitoTrigger, logger, verificationApi, publicApi, migrations },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -101,6 +117,7 @@ const serverlessConfiguration: AWS = {
       ...dynamodbResources,
       ...cloudwatchResources,
       ...backupResources,
+      ...s3Resources,
     },
     Outputs: {
       UsersTable: {
@@ -117,6 +134,11 @@ const serverlessConfiguration: AWS = {
         },
         Export: {
           Name: 'UsersTable-Arn',
+        },
+      },
+      ISAUsersImagesS3BucketArn: {
+        Value: {
+          'Fn::GetAtt': ['IsaUsersImagesS3Bucket', 'Arn'],
         },
       },
     },

@@ -9,7 +9,8 @@ interface NonKeyAttrs {
   cognitoSub: string;
   cognitoUsername: string;
   name?: string;
-  profilePictureUrl?: string;
+  // profilePictureUrl?: string;
+  profilePictureS3Key?: string;
   city?: string;
   country?: string;
   organizationType?: 'club' | 'other';

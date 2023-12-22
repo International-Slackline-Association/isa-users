@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express';
 import { catchExpressJsErrorWrapper, validateOrganizationExists } from '../utils';
 import * as db from 'core/db';
-import type { UpdateOrganizationPostBody } from './types';
+import type { UpdateOrganizationPostBody, UpdateProfilePicturePostBody } from './types';
 import { assignExistingFields } from 'core/utils';
+import { processAndPutProfilePhoto } from 'core/utils/images-processing';
 
 export const getAllOrganizations = async (req: Request, res: Response) => {
   const organizations = await db.getAllOrganizations();
@@ -12,7 +13,7 @@ export const getAllOrganizations = async (req: Request, res: Response) => {
       organizationId: c.organizationId,
       name: c.name,
       email: c.email,
-      profilePictureUrl: c.profilePictureUrl,
+      profilePictureS3Key: c.profilePictureS3Key,
     })),
   });
 };
@@ -23,17 +24,32 @@ export const getOrganizationDetail = async (req: Request, res: Response) => {
 };
 
 export const updateOrganization = async (req: Request<any, any, UpdateOrganizationPostBody>, res: Response) => {
-  const { name, city, contactPhone, country, profilePictureUrl } = req.body;
+  const { name, city, contactPhone, country } = req.body;
   const organization = await validateOrganizationExists(req.user.isaId);
   const updatedOrganization = assignExistingFields(organization, {
     name,
     city,
     contactPhone,
     country,
-    profilePictureUrl,
   });
   await db.putOrganization(updatedOrganization);
   res.end();
+};
+
+export const updateOrganizationProfilePicture = async (
+  req: Request<any, any, UpdateProfilePicturePostBody>,
+  res: Response,
+) => {
+  const organization = await validateOrganizationExists(req.user.isaId);
+  if (!req.body.processingBucketKey) {
+    delete organization.profilePictureS3Key;
+    await db.putOrganization(organization);
+  } else {
+    const { s3Key } = await processAndPutProfilePhoto(req.body.processingBucketKey, req.user.isaId);
+    organization.profilePictureS3Key = s3Key;
+    await db.putOrganization(organization);
+  }
+  res.json({});
 };
 
 export const getUsersOfOrganization = async (req: Request, res: Response) => {
@@ -51,7 +67,7 @@ export const getUsersOfOrganization = async (req: Request, res: Response) => {
           email: u.email,
           isPendingApproval: userOrganization.isPendingApproval,
           joinedAt: userOrganization.joinedAt,
-          profilePictureUrl: u.profilePictureUrl,
+          profilePictureS3Key: u.profilePictureS3Key,
         };
       })
       .sort((a, b) => (a.joinedAt > b.joinedAt ? -1 : 1));
@@ -85,6 +101,7 @@ export const removeUser = async (req: Request, res: Response) => {
 export const organizationApi = express.Router();
 organizationApi.get('/all', catchExpressJsErrorWrapper(getAllOrganizations));
 organizationApi.put('/details', catchExpressJsErrorWrapper(updateOrganization));
+organizationApi.put('/profilePicture', catchExpressJsErrorWrapper(updateOrganizationProfilePicture));
 organizationApi.get('/details', catchExpressJsErrorWrapper(getOrganizationDetail));
 organizationApi.get('/users', catchExpressJsErrorWrapper(getUsersOfOrganization));
 organizationApi.post('/user/:userId/approve', catchExpressJsErrorWrapper(approveUserJoinRequest));

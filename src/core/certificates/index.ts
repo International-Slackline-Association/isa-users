@@ -78,7 +78,7 @@ export const getInstructorsFromSpreadsheet = async (certId?: string) => {
     const email = row[2]?.trim() as string;
     const name = row[3]?.trim() as string;
     const surname = row[4]?.trim() as string;
-    const level = row[5].trim() as string;
+    const level = row[5]?.trim() as string;
     const startDate = row[6]?.toLowerCase().trim() as string;
     const endDate = row[7]?.toLowerCase().trim() as string;
     const country = row[8]?.trim() as string;

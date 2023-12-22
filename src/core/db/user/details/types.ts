@@ -15,9 +15,9 @@ interface NonKeyAttrs {
   city?: string;
   country?: string;
   emergencyContact?: string;
-  profilePictureUrl?: string;
+  // profilePictureUrl?: string;
+  profilePictureS3Key?: string;
   createdDateTime?: string;
-
 }
 
 export type DDBUserDetailItem = ParsedKeyAttrs & NonKeyAttrs;

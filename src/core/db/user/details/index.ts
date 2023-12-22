@@ -1,9 +1,9 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { ddb } from 'core/aws/clients';
 import { DDBUserDetailAttrs, DDBUserDetailItem } from 'core/db/user/details/types';
-import { composeKey, destructKey, TABLE_NAME, transformUtils } from 'core/db/utils';
+import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
 
-const { key, attrsToItem, itemToAttrs } = transformUtils<DDBUserDetailItem, DDBUserDetailAttrs>({
+const { key, attrsToItem, itemToAttrs, keyFields, keyUtils } = transformUtils<DDBUserDetailItem, DDBUserDetailAttrs>({
   PK: {
     fields: ['userId'],
     compose: (params) => composeKey('user', params.userId),
@@ -47,6 +47,26 @@ export const getUsers = async (userIds: string[]) => {
     .promise()
     .then((data) => {
       const items = data.Responses?.[TABLE_NAME] || [];
+      return items.map((i: DDBUserDetailAttrs) => attrsToItem(i));
+    });
+};
+
+export const getAllUsers = async () => {
+  return ddb
+    .query({
+      TableName: TABLE_NAME,
+      IndexName: INDEX_NAMES.GSI,
+      KeyConditionExpression: '#SK_GSI = :SK_GSI',
+      ExpressionAttributeNames: {
+        '#SK_GSI': keyFields.SK_GSI,
+      },
+      ExpressionAttributeValues: {
+        ':SK_GSI': keyUtils.SK_GSI.compose({}),
+      },
+    })
+    .promise()
+    .then((data) => {
+      const items = data.Items || [];
       return items.map((i: DDBUserDetailAttrs) => attrsToItem(i));
     });
 };

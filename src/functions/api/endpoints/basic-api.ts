@@ -21,7 +21,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
     name: details.name,
     surname: details['surname'],
     email: details.email,
-    profilePictureUrl: details.profilePictureUrl,
+    profilePictureUrl: `https://images.slacklineinternational.org/${details.profilePictureS3Key}`,
     identityType: identityType,
   };
 
