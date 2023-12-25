@@ -1,3 +1,4 @@
+import { GetParametersCommand } from '@aws-sdk/client-ssm';
 import { ssm } from 'core/aws/clients';
 import { google, sheets_v4 } from 'googleapis';
 
@@ -26,7 +27,9 @@ const loadSSMParameters = async () => {
   if (cache) {
     return cache;
   }
-  const ssmParam = await ssm.getParameters({ Names: [googleCredsSSMParameter, spreadsheetIdSSMParameter] }).promise();
+  const ssmParam = await ssm.send(
+    new GetParametersCommand({ Names: [googleCredsSSMParameter, spreadsheetIdSSMParameter] }),
+  );
   const googleCreds = JSON.parse(ssmParam.Parameters.filter((p) => p.Name === googleCredsSSMParameter)[0].Value);
   const spreadsheetId = ssmParam.Parameters.filter((p) => p.Name === spreadsheetIdSSMParameter)[0].Value;
   cache = { googleCreds, spreadsheetId };

@@ -1,12 +1,9 @@
-import AWS from 'aws-sdk';
-import { ddb } from 'core/aws/clients';
 import dotenv from 'dotenv';
-import config from '../config.json';
-import { getAllCognitoUsers } from './remindUnverifiedUsers';
-
-export const cisProvider = new AWS.CognitoIdentityServiceProvider();
-
 dotenv.config();
+
+import { ddb } from 'core/aws/clients';
+import { getAllCognitoUsers } from './remindUnverifiedUsers';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 const listIncorrectItems = async () => {
   const items = await getAllItems();
@@ -28,13 +25,13 @@ async function getAllItems() {
   let lastEvaluatedKey: any = undefined;
   const items = [];
   do {
-    const result = await ddb
-      .scan({
+    const result = await ddb.send(
+      new ScanCommand({
         TableName: process.env.ISA_USERS_TABLE,
         FilterExpression: 'PK <> genericHashes',
         ExclusiveStartKey: lastEvaluatedKey,
-      })
-      .promise();
+      }),
+    );
 
     lastEvaluatedKey = result.LastEvaluatedKey;
     items.push(...result.Items);

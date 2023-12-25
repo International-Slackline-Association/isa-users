@@ -1,5 +1,6 @@
+import { AdminUpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 import type { PostConfirmationTriggerEvent, PreSignUpTriggerEvent, PostAuthenticationTriggerEvent } from 'aws-lambda';
-import { cisProvider, ses } from 'core/aws/clients';
+import { cisProvider } from 'core/aws/clients';
 import * as db from 'core/db';
 import { slacklineDataApi } from 'core/external-api/slackline-data-api';
 import { logger } from 'core/logger';
@@ -62,8 +63,8 @@ const updateCognitoAttributes = async (
 ) => {
   const isaMembers = await slacklineDataApi.getIsaMembersList();
   const isaMember = isaMembers.find((member) => member.email === attrs.email);
-  await cisProvider
-    .adminUpdateUserAttributes({
+  await cisProvider.send(
+    new AdminUpdateUserAttributesCommand({
       UserPoolId: userPoolId,
       Username: username,
       UserAttributes: [
@@ -72,8 +73,8 @@ const updateCognitoAttributes = async (
           Value: isaMember ? 'organization' : 'individual',
         },
       ],
-    })
-    .promise();
+    }),
+  );
 };
 
 export const main = cognitoTrigger;

@@ -10,7 +10,7 @@ const verificationApi: APIGatewayProxyHandlerV2 = async (event) => {
   const documentToken = event.queryStringParameters?.token;
 
   const result = await verifyDocument(path, documentId, documentToken);
-  let html = htmlTemplate.replaceAll('[VERIFICATION_HEADER]', result.verificationHeader);
+  let html = (htmlTemplate as string).replaceAll('[VERIFICATION_HEADER]', result.verificationHeader);
   html = html.replaceAll('[META_HEADER]', result.metaHeader);
   html = html.replaceAll('[CONTENT_TEXT]', result.contentText);
   if (!result.isVerified) {

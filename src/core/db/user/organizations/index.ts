@@ -1,4 +1,4 @@
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb } from 'core/aws/clients';
 import { DDBUserOrganizationAttrs, DDBUserOrganizationItem } from 'core/db/user/organizations/types';
 import { composeKey, destructKey, INDEX_NAMES, TABLE_NAME, transformUtils } from 'core/db/utils';
@@ -28,19 +28,20 @@ const { attrsToItem, itemToAttrs, keyFields, keyUtils, key } = transformUtils<
 
 export const getOrganizationsOfUser = async (userId: string) => {
   return ddb
-    .query({
-      TableName: TABLE_NAME,
-      KeyConditionExpression: '#PK = :PK and begins_with(#SK_GSI, :sortKeyPrefix)',
-      ExpressionAttributeNames: {
-        '#PK': keyFields.PK,
-        '#SK_GSI': keyFields.SK_GSI,
-      },
-      ExpressionAttributeValues: {
-        ':PK': keyUtils.PK.compose({ userId }),
-        ':sortKeyPrefix': keyUtils.SK_GSI.compose({}),
-      },
-    })
-    .promise()
+    .send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: '#PK = :PK and begins_with(#SK_GSI, :sortKeyPrefix)',
+        ExpressionAttributeNames: {
+          '#PK': keyFields.PK,
+          '#SK_GSI': keyFields.SK_GSI,
+        },
+        ExpressionAttributeValues: {
+          ':PK': keyUtils.PK.compose({ userId }),
+          ':sortKeyPrefix': keyUtils.SK_GSI.compose({}),
+        },
+      }),
+    )
     .then((data) => {
       const items = data.Items || [];
       return items.map((i: DDBUserOrganizationAttrs) => attrsToItem(i));
@@ -49,18 +50,19 @@ export const getOrganizationsOfUser = async (userId: string) => {
 
 export const getUsersOfOrganization = async (organizationId: string) => {
   return ddb
-    .query({
-      TableName: TABLE_NAME,
-      IndexName: INDEX_NAMES.GSI,
-      KeyConditionExpression: '#SK_GSI = :SK_GSI',
-      ExpressionAttributeNames: {
-        '#SK_GSI': keyFields.SK_GSI,
-      },
-      ExpressionAttributeValues: {
-        ':SK_GSI': keyUtils.SK_GSI.compose({ organizationId }),
-      },
-    })
-    .promise()
+    .send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        IndexName: INDEX_NAMES.GSI,
+        KeyConditionExpression: '#SK_GSI = :SK_GSI',
+        ExpressionAttributeNames: {
+          '#SK_GSI': keyFields.SK_GSI,
+        },
+        ExpressionAttributeValues: {
+          ':SK_GSI': keyUtils.SK_GSI.compose({ organizationId }),
+        },
+      }),
+    )
     .then((data) => {
       const items = data.Items || [];
       return items.map((i: DDBUserOrganizationAttrs) => attrsToItem(i));
@@ -69,11 +71,12 @@ export const getUsersOfOrganization = async (organizationId: string) => {
 
 export const getUserOrganization = async (userId: string, organizationId: string) => {
   return ddb
-    .get({
-      TableName: TABLE_NAME,
-      Key: key({ userId, organizationId }),
-    })
-    .promise()
+    .send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: key({ userId, organizationId }),
+      }),
+    )
     .then((data) => {
       if (data.Item) {
         return attrsToItem(data.Item as DDBUserOrganizationAttrs);
@@ -83,11 +86,11 @@ export const getUserOrganization = async (userId: string, organizationId: string
 };
 
 export const putUserOrganization = async (organization: DDBUserOrganizationItem) => {
-  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }).promise();
+  return ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }));
 };
 
 export const updateUserOrganization = async (organization: DDBUserOrganizationItem) => {
-  return ddb.put({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }).promise();
+  return ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: itemToAttrs(organization) }));
 };
 
 export async function updateOrganizationField<T extends keyof DDBUserOrganizationItem>(
@@ -96,20 +99,21 @@ export async function updateOrganizationField<T extends keyof DDBUserOrganizatio
   field: T,
   value: DDBUserOrganizationItem[T],
 ) {
-  const params: DocumentClient.UpdateItemInput = {
-    TableName: TABLE_NAME,
-    Key: key({ userId, organizationId }),
-    UpdateExpression: `SET #field = :v`,
-    ExpressionAttributeNames: {
-      '#field': field,
-    },
-    ExpressionAttributeValues: {
-      ':v': value,
-    },
-  };
-  return ddb.update(params).promise();
+  return ddb.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: key({ userId, organizationId }),
+      UpdateExpression: `SET #field = :v`,
+      ExpressionAttributeNames: {
+        '#field': field,
+      },
+      ExpressionAttributeValues: {
+        ':v': value,
+      },
+    }),
+  );
 }
 
 export const removeUserOrganization = async (userId: string, organizationId: string) => {
-  return ddb.delete({ TableName: TABLE_NAME, Key: key({ organizationId, userId }) }).promise();
+  return ddb.send(new DeleteCommand({ TableName: TABLE_NAME, Key: key({ organizationId, userId }) }));
 };

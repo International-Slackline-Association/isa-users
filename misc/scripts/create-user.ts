@@ -1,7 +1,7 @@
-import AWS from 'aws-sdk';
 import config from '../config.json';
+import { AdminCreateUserCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 
-export const cisProvider = new AWS.CognitoIdentityServiceProvider();
+export const cisProvider = new CognitoIdentityProviderClient();
 
 interface Options {
   username: string;
@@ -11,8 +11,8 @@ interface Options {
 }
 
 const createUser = async (opts: Options) => {
-  await cisProvider
-    .adminCreateUser({
+  await cisProvider.send(
+    new AdminCreateUserCommand({
       Username: opts.username,
       UserPoolId: config.UserPoolId,
       UserAttributes: [
@@ -37,8 +37,8 @@ const createUser = async (opts: Options) => {
           Value: opts.identityType || 'individual',
         },
       ],
-    })
-    .promise();
+    }),
+  );
 };
 
 const findArg = (args: string[], field: string) => {

@@ -1,13 +1,15 @@
-import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
+dotenv.config();
+
 import config from '../config.json';
 import fs from 'fs';
 import path from 'path';
 
-export const ses = new AWS.SES();
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client-cognito-identity-provider';
 
-export const cisProvider = new AWS.CognitoIdentityServiceProvider();
-dotenv.config();
+const ses = new SESClient();
+export const cisProvider = new CognitoIdentityProviderClient();
 
 const html = fs.readFileSync(path.join(__dirname, '../cognito/email-templates/verify-account.html'), 'utf8').toString();
 
@@ -16,7 +18,7 @@ const remindUnverifiedUsers = async () => {
 
   const unverifiedUsers = users.filter((user) => user.email_verified === 'false');
 
-  console.log('unverifiedUsers', unverifiedUsers.length);
+  console.log('unverifiedUsers:', unverifiedUsers.length);
   // let count = 0;
   // for (const user of unverifiedUsers) {
   //   await sendReminderEmail(user.email);
@@ -30,12 +32,12 @@ export const getAllCognitoUsers = async () => {
   let paginationToken: any = undefined;
   const users = [];
   do {
-    const result = await cisProvider
-      .listUsers({
+    const result = await cisProvider.send(
+      new ListUsersCommand({
         UserPoolId: config.UserPoolId,
         PaginationToken: paginationToken,
-      })
-      .promise();
+      }),
+    );
 
     paginationToken = result?.PaginationToken;
     users.push(...result.Users);
@@ -50,8 +52,8 @@ export const getAllCognitoUsers = async () => {
 };
 
 export const sendReminderEmail = async (email: string) => {
-  await ses
-    .sendEmail({
+  await ses.send(
+    new SendEmailCommand({
       Destination: {
         ToAddresses: [email],
       },
@@ -69,8 +71,8 @@ export const sendReminderEmail = async (email: string) => {
       },
       ReplyToAddresses: ['account@slacklineinternational.org'],
       Source: '"ISA Account" <account@slacklineinternational.org>',
-    })
-    .promise();
+    }),
+  );
 };
 
 remindUnverifiedUsers();
