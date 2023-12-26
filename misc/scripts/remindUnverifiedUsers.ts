@@ -30,7 +30,7 @@ const remindUnverifiedUsers = async () => {
 
 export const getAllCognitoUsers = async () => {
   let paginationToken: any = undefined;
-  const users = [];
+  const users = [] as any[];
   do {
     const result = await cisProvider.send(
       new ListUsersCommand({

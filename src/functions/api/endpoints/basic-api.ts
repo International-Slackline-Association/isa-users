@@ -18,10 +18,13 @@ export const getUserDetails = async (req: Request, res: Response) => {
   }
 
   const response = {
+    isaId: req.user.isaId,
     name: details.name,
     surname: details['surname'],
     email: details.email,
-    profilePictureUrl: `https://images.slacklineinternational.org/${details.profilePictureS3Key}`,
+    profilePictureUrl: details.profilePictureS3Key
+      ? `https://images.slacklineinternational.org/${details.profilePictureS3Key}`
+      : undefined,
     identityType: identityType,
   };
 

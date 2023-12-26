@@ -31,7 +31,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ISA_USERS_TABLE: { Ref: 'UsersTable' },
       APPLICATION_LOG_GROUP_NAME: { Ref: 'CloudWatchApplicationLogs' },
-      ISA_DOCUMENTS_IMAGE_PROCESSING_API_KEY: '${ssm:/isa-documents-image-processing-api-key}',
+      ISA_DOCUMENTS_IMAGE_PROCESSING_API_KEY: '${ssm:/isa-documents-trusted-service-api-key}',
       ISA_USERS_IMAGES_S3_BUCKET: { Ref: 'IsaUsersImagesS3Bucket' },
     },
     iam: {
