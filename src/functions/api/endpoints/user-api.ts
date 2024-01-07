@@ -5,8 +5,8 @@ import { UpdateProfilePicturePostBody, UpdateUserPostBody } from '@functions/api
 import { assignExistingFields } from 'core/utils';
 import { sendEmail } from 'core/utils/email';
 import { userJoinNotificationEmailTemplate, userLeaveNotificationEmailTemplate } from 'core/utils/email/emailTypes';
-import { createVerifiableDocument } from 'core/documentVerification';
 import { processAndPutProfilePhoto } from 'core/utils/images-processing';
+import { isaDocumentApi } from 'core/external-api/isa-documents-api';
 
 export const getUserDetails = async (req: Request, res: Response) => {
   const user = await db.getUser(req.user.isaId);
@@ -91,15 +91,15 @@ export const getOrganizationMembershipDocument = async (req: Request, res: Respo
     throw new Error('User is not a member of this organization');
   }
   const expiresInSeconds = 60 * 60 * 24 * 7;
-  const { id, token, verificationUrl, expiresAt } = await createVerifiableDocument({
+  const { hash, token, verificationUrl, expiresAt } = await isaDocumentApi.signDocument({
     subject: `${name} ${surname}`,
     expiresInSeconds: expiresInSeconds,
-    createHash: false,
-    content: `"${name} ${surname}" is an approved member of "${organization.name}"`,
+    createHash: true,
+    content: `"${name} ${surname}" is a member of "${organization.name}"`,
   });
 
   res.json({
-    id,
+    hash,
     token,
     verificationUrl,
     expiresAt,

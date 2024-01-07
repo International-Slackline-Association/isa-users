@@ -24,15 +24,15 @@ interface ProcessImagePayload {
   cacheControl?: string;
 }
 const api = axios.create({
-  baseURL: `https://k6wagh946a.execute-api.eu-central-1.amazonaws.com/prod/image-processor`,
+  baseURL: `https://docs-api.slacklineinternational.org`,
   headers: {
-    'x-api-key': process.env.ISA_DOCUMENTS_IMAGE_PROCESSING_API_KEY,
+    'x-api-key': process.env.ISA_DOCUMENTS_TRUSTED_SERVICE_API_KEY,
   },
 });
 
 const processImage = async (payload: ProcessImagePayload) => {
   return api
-    .post(`/process`, payload)
+    .post(`image-processor/process`, payload)
     .then(() => true)
     .catch((err) => {
       logger.error('Error while processing image', { message: err.message });
@@ -40,6 +40,52 @@ const processImage = async (payload: ProcessImagePayload) => {
     });
 };
 
+const listCertificates = async (isaId: string, email: string) => {
+  const query = `?isaId=${isaId}&email=${email}`;
+  const response = await api.get(`certificate${query}`).then((res) => res.data);
+
+  return response as {
+    items: {
+      certificateType: string;
+      certId?: string;
+      title?: string;
+      isaId?: string;
+      email?: string;
+    }[];
+  };
+};
+
+const generateCertificate = async (payload: {
+  certificateType: string;
+  certificateId: string;
+  subject: string;
+  language: string;
+}) => {
+  const response = await api.post(`certificate/generate`, payload).then((res) => res.data);
+  return response as {
+    pdfUrl: string;
+    certificateId: string;
+  };
+};
+
+const signDocument = async (payload: {
+  subject: string;
+  expiresInSeconds: number;
+  createHash?: boolean;
+  content: string;
+}) => {
+  const response = await api.post(`sign`, payload).then((res) => res.data);
+  return response as {
+    hash: string;
+    token: string;
+    verificationUrl: string;
+    expiresAt: string;
+  };
+};
+
 export const isaDocumentApi = {
   processImage,
+  listCertificates,
+  generateCertificate,
+  signDocument,
 };

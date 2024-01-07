@@ -3,8 +3,6 @@ import type { AWS } from '@serverless/typescript';
 import api from '@functions/api';
 import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
-import verificationApi from '@functions/verification-api';
-import publicApi from '@functions/public-api';
 import migrations from '@functions/migrations';
 
 import { dynamodbResources } from 'infrastructure/dynamodb';
@@ -31,7 +29,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       ISA_USERS_TABLE: { Ref: 'UsersTable' },
       APPLICATION_LOG_GROUP_NAME: { Ref: 'CloudWatchApplicationLogs' },
-      ISA_DOCUMENTS_IMAGE_PROCESSING_API_KEY: '${ssm:/isa-documents-trusted-service-api-key}',
+      ISA_DOCUMENTS_TRUSTED_SERVICE_API_KEY: '${ssm:/isa-documents-trusted-service-api-key}',
       ISA_USERS_IMAGES_S3_BUCKET: { Ref: 'IsaUsersImagesS3Bucket' },
     },
     iam: {
@@ -87,7 +85,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger, verificationApi, publicApi, migrations },
+  functions: { api, cognitoTrigger, logger, migrations },
   package: { individually: true },
   custom: {
     esbuild: {
