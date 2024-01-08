@@ -91,7 +91,7 @@ export const getOrganizationMembershipDocument = async (req: Request, res: Respo
     throw new Error('User is not a member of this organization');
   }
   const expiresInSeconds = 60 * 60 * 24 * 7;
-  const { hash, token, verificationUrl, expiresAt } = await isaDocumentApi.signDocument({
+  const { token, verificationUrl, expiresAt } = await isaDocumentApi.signDocument({
     subject: `${name} ${surname}`,
     expiresInSeconds: expiresInSeconds,
     createHash: true,
@@ -99,7 +99,6 @@ export const getOrganizationMembershipDocument = async (req: Request, res: Respo
   });
 
   res.json({
-    hash,
     token,
     verificationUrl,
     expiresAt,

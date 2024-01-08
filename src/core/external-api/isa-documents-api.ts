@@ -76,7 +76,6 @@ const signDocument = async (payload: {
 }) => {
   const response = await api.post(`sign`, payload).then((res) => res.data);
   return response as {
-    hash: string;
     token: string;
     verificationUrl: string;
     expiresAt: string;
