@@ -1,0 +1,62 @@
+{
+  "name": "isa-users-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "serverless.ts",
+  "scripts": {
+    "checkTs": "tsc --noEmit",
+    "build": "tsc --build",
+    "package": "serverless package",
+    "deploy": "eslint . && serverless deploy --verbose",
+    "deploy:api": "serverless deploy function -f api",
+    "deploy:cognito": "serverless deploy function -f cognitoTrigger",
+    "deploy:verification-api": "serverless deploy function -f verificationApi",
+    "deploy:public-api": "serverless deploy function -f publicApi",
+    "invoke:migrations": "serverless invoke local -f migrations",
+    "scripts:create-user": "ts-node misc/scripts/create-user.ts",
+    "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts",
+    "scripts:remindUnverifiedUsers": "ts-node misc/scripts/remindUnverifiedUsers.ts",
+    "scripts:listOrganizationMembers": "ts-node misc/scripts/listOrganizationMembers.ts"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "3.489.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.489.0",
+    "@aws-sdk/client-dynamodb": "3.489.0",
+    "@aws-sdk/client-ses": "3.489.0",
+    "@aws-sdk/client-ssm": "3.489.0",
+    "@aws-sdk/lib-dynamodb": "3.489.0",
+    "@vendia/serverless-express": "4.12.6",
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "googleapis": "130.0.0",
+    "jsonwebtoken": "9.0.2",
+    "lodash.clonedeep": "4.5.0",
+    "winston": "3.11.0"
+  },
+  "devDependencies": {
+    "@serverless/typescript": "3.38.0",
+    "@types/aws-lambda": "8.10.131",
+    "@types/cors": "2.8.17",
+    "@types/dotenv": "8.2.0",
+    "@types/express": "4.17.21",
+    "@types/jsonwebtoken": "9.0.5",
+    "@types/lodash.clonedeep": "4.5.9",
+    "@types/node": "20.11.0",
+    "dotenv": "16.3.1",
+    "esbuild": "0.19.11",
+    "serverless": "3.38.0",
+    "serverless-esbuild": "1.50.1",
+    "serverless-plugin-log-subscription": "2.2.0",
+    "serverless-prune-plugin": "2.0.2",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "type-fest": "4.9.0",
+    "typescript": "5.3.3"
+  },
+  "author": "Can Sahin",
+  "license": "GPL-3"
+}
