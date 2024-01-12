@@ -8,41 +8,31 @@ import {
   userLeaveNotificationEmailTemplate,
 } from 'core/utils/email/emailTypes';
 import { processAndPutProfilePhoto } from 'core/utils/images-processing';
-import express, { Request, Response } from 'express';
+import express, { Request } from 'express';
 
-import {
-  catchExpressJsErrorWrapper,
-  validateOrganizationExists,
-  validateUserExists,
-} from '../utils';
+import { expressRoute, validateOrganizationExists, validateUserExists } from '../utils';
 
-export const getUserDetails = async (req: Request, res: Response) => {
+export const getUserDetails = async (req: Request) => {
   const user = await db.getUser(req.user.isaId);
-  res.json(user);
+  return user;
 };
 
-export const getOrganizationsOfUser = async (req: Request, res: Response) => {
+export const getOrganizationsOfUser = async (req: Request) => {
   const userOrganizations = await db.getOrganizationsOfUser(req.user.isaId);
-  if (userOrganizations.length > 0) {
-    const organizations = await db.getOrganizations(userOrganizations.map((c) => c.organizationId));
-    const items = organizations
-      .map((c) => {
-        const userOrganization = userOrganizations.find(
-          (u) => u.organizationId === c.organizationId,
-        );
-        return {
-          ...c,
-          ...userOrganization,
-        };
-      })
-      .sort((a, b) => (a.joinedAt > b.joinedAt ? -1 : 1));
-    res.json({ items });
-  } else {
-    res.json({ items: [] });
-  }
+  const organizations = await db.getOrganizations(userOrganizations.map((c) => c.organizationId));
+  const items = organizations
+    .map((c) => {
+      const userOrganization = userOrganizations.find((u) => u.organizationId === c.organizationId);
+      return {
+        ...c,
+        ...userOrganization,
+      };
+    })
+    .sort((a, b) => (a.joinedAt > b.joinedAt ? -1 : 1));
+  return { items };
 };
 
-export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res: Response) => {
+export const updateUser = async (req: Request<any, any, UpdateUserPostBody>) => {
   const { name, surname, birthDate, city, country, emergencyContact, gender, phoneNumber } =
     req.body;
   const user = await validateUserExists(req.user.isaId);
@@ -57,12 +47,11 @@ export const updateUser = async (req: Request<any, any, UpdateUserPostBody>, res
     phoneNumber,
   });
   await db.putUser(updatedUser);
-  res.json({});
+  return {};
 };
 
 export const updateUserProfilePicture = async (
   req: Request<any, any, UpdateProfilePicturePostBody>,
-  res: Response,
 ) => {
   const user = await validateUserExists(req.user.isaId);
   if (!req.body.processingBucketKey) {
@@ -73,10 +62,10 @@ export const updateUserProfilePicture = async (
     user.profilePictureS3Key = s3Key;
     await db.putUser(user);
   }
-  res.json({});
+  return {};
 };
 
-export const joinOrganization = async (req: Request, res: Response) => {
+export const joinOrganization = async (req: Request) => {
   const organizationId = req.params.id;
   const { userId, name, surname } = await validateUserExists(req.user.isaId);
   const organization = await validateOrganizationExists(organizationId);
@@ -93,10 +82,10 @@ export const joinOrganization = async (req: Request, res: Response) => {
   const { html, subject } = userJoinNotificationEmailTemplate(name, surname);
   await sendEmail({ address: organization.email, subject, html });
 
-  res.end();
+  return {};
 };
 
-export const getOrganizationMembershipDocument = async (req: Request, res: Response) => {
+export const getOrganizationMembershipDocument = async (req: Request) => {
   const organizationId = req.params.id;
   const { userId, name, surname } = await validateUserExists(req.user.isaId);
   const organization = await validateOrganizationExists(organizationId);
@@ -112,14 +101,14 @@ export const getOrganizationMembershipDocument = async (req: Request, res: Respo
     content: `"${name} ${surname}" is a member of "${organization.name}"`,
   });
 
-  res.json({
+  return {
     token,
     verificationUrl,
     expiresAt,
-  });
+  };
 };
 
-export const leaveOrganization = async (req: Request, res: Response) => {
+export const leaveOrganization = async (req: Request) => {
   const organizationId = req.params.id;
   const { name, surname } = await validateUserExists(req.user.isaId);
   const organization = await validateOrganizationExists(organizationId);
@@ -129,17 +118,17 @@ export const leaveOrganization = async (req: Request, res: Response) => {
   const { html, subject } = userLeaveNotificationEmailTemplate(name, surname);
   await sendEmail({ address: organization.email, subject, html });
 
-  res.end();
+  return {};
 };
 
 export const userApi = express.Router();
-userApi.get('/details', catchExpressJsErrorWrapper(getUserDetails));
-userApi.put('/details', catchExpressJsErrorWrapper(updateUser));
-userApi.put('/profilePicture', catchExpressJsErrorWrapper(updateUserProfilePicture));
-userApi.get('/organizations', catchExpressJsErrorWrapper(getOrganizationsOfUser));
-userApi.post('/organization/:id/join', catchExpressJsErrorWrapper(joinOrganization));
-userApi.delete('/organization/:id', catchExpressJsErrorWrapper(leaveOrganization));
+userApi.get('/details', expressRoute(getUserDetails));
+userApi.put('/details', expressRoute(updateUser));
+userApi.put('/profilePicture', expressRoute(updateUserProfilePicture));
+userApi.get('/organizations', expressRoute(getOrganizationsOfUser));
+userApi.post('/organization/:id/join', expressRoute(joinOrganization));
+userApi.delete('/organization/:id', expressRoute(leaveOrganization));
 userApi.get(
   '/organization/:id/membershipDocument',
-  catchExpressJsErrorWrapper(getOrganizationMembershipDocument),
+  expressRoute(getOrganizationMembershipDocument),
 );

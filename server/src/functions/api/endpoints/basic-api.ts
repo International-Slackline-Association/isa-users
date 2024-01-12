@@ -1,11 +1,11 @@
 import * as db from 'core/db';
 import { DDBOrganizationItem } from 'core/db/organization/types';
 import { DDBUserDetailItem } from 'core/db/user/details/types';
-import express, { Request, Response } from 'express';
+import express, { Request } from 'express';
 
-import { catchExpressJsErrorWrapper } from '../utils';
+import { expressRoute } from '../utils';
 
-export const getUserDetails = async (req: Request, res: Response) => {
+export const getUserDetails = async (req: Request) => {
   let details: DDBUserDetailItem | DDBOrganizationItem;
   let identityType = 'individual';
   details = await db.getUser(req.user.isaId);
@@ -29,8 +29,8 @@ export const getUserDetails = async (req: Request, res: Response) => {
     identityType: identityType,
   };
 
-  res.json(response);
+  return response;
 };
 
 export const basicApi = express.Router();
-basicApi.get('/userDetails', catchExpressJsErrorWrapper(getUserDetails));
+basicApi.get('/userDetails', expressRoute(getUserDetails));

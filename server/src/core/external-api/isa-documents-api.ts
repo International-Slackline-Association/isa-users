@@ -45,13 +45,14 @@ const listCertificates = async (isaId: string, email: string) => {
   const response = await api.get(`certificate${query}`).then((res) => res.data);
 
   return response as {
-    items: {
+    certificates: {
       certificateType: string;
-      certId?: string;
-      title?: string;
+      certId: string;
+      title: string;
       isaId?: string;
       email?: string;
     }[];
+    certificateLanguages: { [key: string]: string[] };
   };
 };
 

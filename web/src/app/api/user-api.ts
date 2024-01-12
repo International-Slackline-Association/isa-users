@@ -1,12 +1,19 @@
+import {
+  getOrganizationMembershipDocument,
+  getOrganizationsOfUser,
+  getUserDetails,
+  joinOrganization,
+  leaveOrganization,
+  updateUser,
+  updateUserProfilePicture,
+} from '@server/functions/api/endpoints/user-api';
 import { baseApi } from 'store/rtk-query';
+import { AsyncReturnType } from 'type-fest';
 import { showSuccessNotification } from 'utils';
 
-import type {
-  GetOrganizationsOfUserResponse,
-  GetUserAPIResponse,
-  SignedDocumentResponse,
-  UpdateProfilePictureBody,
-} from './types';
+import { UpdateProfilePictureBody } from './types';
+
+export type GetUserAPIResponse = AsyncReturnType<typeof getUserDetails>;
 
 export const userApi = baseApi
   .enhanceEndpoints({
@@ -14,12 +21,24 @@ export const userApi = baseApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
-      getUserDetails: builder.query<GetUserAPIResponse, void>({
+      getUserDetails: builder.query<AsyncReturnType<typeof getUserDetails>, void>({
         query: () => ({ url: `user/details` }),
         providesTags: ['userDetails'],
       }),
 
-      updateUserDetails: builder.mutation<GetUserAPIResponse, Partial<GetUserAPIResponse>>({
+      updateUserDetails: builder.mutation<
+        AsyncReturnType<typeof updateUser>,
+        {
+          name: string;
+          surname: string;
+          gender?: 'm' | 'f' | 'o';
+          birthDate?: string;
+          phoneNumber?: string;
+          city?: string;
+          country?: string;
+          emergencyContact?: string;
+        }
+      >({
         query: (body) => ({
           url: `user/details`,
           method: 'PUT',
@@ -31,7 +50,10 @@ export const userApi = baseApi
           dispatch(showSuccessNotification('Saved Changes'));
         },
       }),
-      updateUserProfilePicture: builder.mutation<Record<string, never>, UpdateProfilePictureBody>({
+      updateUserProfilePicture: builder.mutation<
+        AsyncReturnType<typeof updateUserProfilePicture>,
+        UpdateProfilePictureBody
+      >({
         query: (body) => ({
           url: `user/profilePicture`,
           method: 'PUT',
@@ -43,21 +65,24 @@ export const userApi = baseApi
           dispatch(showSuccessNotification('Saved Changes'));
         },
       }),
-      getOrganizationsOfUser: builder.query<GetOrganizationsOfUserResponse['items'], void>({
+      getOrganizationsOfUser: builder.query<
+        AsyncReturnType<typeof getOrganizationsOfUser>['items'],
+        void
+      >({
         query: () => ({ url: `user/organizations` }),
         providesTags: ['userOrganizations'],
-        transformResponse(response: GetOrganizationsOfUserResponse) {
+        transformResponse(response: AsyncReturnType<typeof getOrganizationsOfUser>) {
           return response.items;
         },
       }),
-      leaveOrganization: builder.mutation<void, string>({
+      leaveOrganization: builder.mutation<AsyncReturnType<typeof leaveOrganization>, string>({
         query: (id) => ({
           url: `user/organization/${id}`,
           method: 'DELETE',
         }),
         invalidatesTags: ['userOrganizations'],
       }),
-      joinOrganization: builder.mutation<void, string>({
+      joinOrganization: builder.mutation<AsyncReturnType<typeof joinOrganization>, string>({
         query: (id) => ({
           url: `user/organization/${id}/join`,
           method: 'POST',
@@ -71,7 +96,10 @@ export const userApi = baseApi
         },
       }),
 
-      getOrganizationMembershipDocument: builder.query<SignedDocumentResponse, string>({
+      getOrganizationMembershipDocument: builder.query<
+        AsyncReturnType<typeof getOrganizationMembershipDocument>,
+        string
+      >({
         query: (id) => ({ url: `user/organization/${id}/membershipDocument` }),
         providesTags: ['userDocuments'],
       }),

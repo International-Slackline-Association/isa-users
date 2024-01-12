@@ -105,7 +105,7 @@ export function MyOrganizations() {
                         src={imageUrlFromS3Key(organization?.profilePictureS3Key)}
                         sx={{ mr: 1 }}
                       >
-                        {organization.name.substring(0, 1)}
+                        {organization.name?.substring(0, 1)}
                       </Avatar>
                       {organization.name}
                     </Box>

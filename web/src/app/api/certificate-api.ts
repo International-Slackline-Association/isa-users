@@ -1,6 +1,6 @@
+import { getAllCertificates } from '@server/functions/api/endpoints/certificate-api';
 import { baseApi } from 'store/rtk-query';
-
-import type { ListAllCertificatesAPIResponse } from './types';
+import { AsyncReturnType } from 'type-fest';
 
 export const certificateApi = baseApi
   .enhanceEndpoints({
@@ -8,7 +8,7 @@ export const certificateApi = baseApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
-      listCertificates: builder.query<ListAllCertificatesAPIResponse, void>({
+      listCertificates: builder.query<AsyncReturnType<typeof getAllCertificates>, void>({
         query: () => ({ url: `certificate/all` }),
       }),
       generateCertificate: builder.mutation<

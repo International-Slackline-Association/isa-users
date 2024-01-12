@@ -1,4 +1,4 @@
-import { GetOrganizationAPIResponse } from 'app/api/types';
+import { GetOrganizationAPIResponse } from 'app/api/organization-api';
 
 /* --- STATE --- */
 export interface OrganizationState {

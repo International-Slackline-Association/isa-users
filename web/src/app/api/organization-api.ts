@@ -1,12 +1,19 @@
+import {
+  approveUserJoinRequest,
+  getAllOrganizations,
+  getOrganizationDetail,
+  getUsersOfOrganization,
+  removeUser,
+  updateOrganization,
+  updateOrganizationProfilePicture,
+} from '@server/functions/api/endpoints/organization-api';
 import { baseApi } from 'store/rtk-query';
+import { AsyncReturnType } from 'type-fest';
 import { showSuccessNotification } from 'utils';
 
-import type {
-  GetAllOrganizationsAPIResponse,
-  GetOrganizationAPIResponse,
-  GetUsersOfOrganizationResponse,
-  UpdateProfilePictureBody,
-} from './types';
+import type { UpdateProfilePictureBody } from './types';
+
+export type GetOrganizationAPIResponse = AsyncReturnType<typeof getOrganizationDetail>;
 
 export const organizationApi = baseApi
   .enhanceEndpoints({
@@ -14,20 +21,28 @@ export const organizationApi = baseApi
   })
   .injectEndpoints({
     endpoints: (builder) => ({
-      getAllOrganizations: builder.query<GetAllOrganizationsAPIResponse['items'], void>({
+      getAllOrganizations: builder.query<
+        AsyncReturnType<typeof getAllOrganizations>['items'],
+        void
+      >({
         query: () => ({ url: `organization/all` }),
-        transformResponse(response: GetAllOrganizationsAPIResponse) {
+        transformResponse(response: AsyncReturnType<typeof getAllOrganizations>) {
           return response.items;
         },
       }),
-      getOrganizationDetails: builder.query<GetOrganizationAPIResponse, void>({
+      getOrganizationDetails: builder.query<AsyncReturnType<typeof getOrganizationDetail>, void>({
         query: () => ({ url: `organization/details` }),
         providesTags: ['organizationDetails'],
       }),
 
       updateOrganizationDetails: builder.mutation<
-        GetOrganizationAPIResponse,
-        Partial<GetOrganizationAPIResponse>
+        AsyncReturnType<typeof updateOrganization>,
+        {
+          name: string;
+          city?: string;
+          country?: string;
+          contactPhone?: string;
+        }
       >({
         query: (body) => ({
           url: `organization/details`,
@@ -37,12 +52,12 @@ export const organizationApi = baseApi
         invalidatesTags: ['organizationDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled;
-          dispatch(showSuccessNotification('Saved Changes'));
+          dispatch(showSuccessNotification('Changes saved'));
         },
       }),
 
       updateOrganizationProfilePicture: builder.mutation<
-        Record<string, never>,
+        AsyncReturnType<typeof updateOrganizationProfilePicture>,
         UpdateProfilePictureBody
       >({
         query: (body) => ({
@@ -53,18 +68,21 @@ export const organizationApi = baseApi
         invalidatesTags: ['organizationDetails'],
         async onQueryStarted(_, { dispatch, queryFulfilled }) {
           await queryFulfilled;
-          dispatch(showSuccessNotification('Saved Changes'));
+          dispatch(showSuccessNotification('Changes saved'));
         },
       }),
 
-      getUsersOfOrganization: builder.query<GetUsersOfOrganizationResponse['items'], void>({
+      getUsersOfOrganization: builder.query<
+        AsyncReturnType<typeof getUsersOfOrganization>['items'],
+        void
+      >({
         query: () => ({ url: `organization/users` }),
         providesTags: ['organizationUsers'],
-        transformResponse(response: GetUsersOfOrganizationResponse) {
+        transformResponse(response: AsyncReturnType<typeof getUsersOfOrganization>) {
           return response.items;
         },
       }),
-      approveUser: builder.mutation<void, string>({
+      approveUser: builder.mutation<AsyncReturnType<typeof approveUserJoinRequest>, string>({
         query: (id) => ({
           url: `organization/user/${id}/approve`,
           method: 'POST',
@@ -75,7 +93,7 @@ export const organizationApi = baseApi
           dispatch(showSuccessNotification('Approved member'));
         },
       }),
-      removeUser: builder.mutation<void, string>({
+      removeUser: builder.mutation<AsyncReturnType<typeof removeUser>, string>({
         query: (id) => ({
           url: `organization/user/${id}`,
           method: 'DELETE',

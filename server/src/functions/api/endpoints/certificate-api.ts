@@ -1,14 +1,14 @@
 import { isaDocumentApi } from 'core/external-api/isa-documents-api';
-import express, { Request, Response } from 'express';
+import express, { Request } from 'express';
 
-import { catchExpressJsErrorWrapper, validateUserExists } from '../utils';
+import { expressRoute, validateUserExists } from '../utils';
 
-export const getAllCertificates = async (req: Request, res: Response) => {
+export const getAllCertificates = async (req: Request) => {
   const certificates = await isaDocumentApi.listCertificates(req.user.isaId, req.user.email);
-  res.json(certificates);
+  return certificates;
 };
 
-export const generateCertificate = async (req: Request, res: Response) => {
+export const generateCertificate = async (req: Request) => {
   const { name, surname } = await validateUserExists(req.user.isaId);
 
   const response = await isaDocumentApi.generateCertificate({
@@ -17,9 +17,9 @@ export const generateCertificate = async (req: Request, res: Response) => {
     subject: `${name} ${surname}`,
     language: req.body.language,
   });
-  res.json(response);
+  return response;
 };
 
 export const certificateApi = express.Router();
-certificateApi.get('/all', catchExpressJsErrorWrapper(getAllCertificates));
-certificateApi.put('/generate', catchExpressJsErrorWrapper(generateCertificate));
+certificateApi.get('/all', expressRoute(getAllCertificates));
+certificateApi.put('/generate', expressRoute(generateCertificate));
