@@ -20,7 +20,7 @@ export const amplifyConfig: ResourcesConfig = {
   },
   Storage: {
     S3: {
-      bucket: 'isa-documents-uploads-prod',
+      bucket: 'isa-tools-temporary-uploads-prod',
       region: 'eu-central-1',
     },
   },

@@ -1,8 +1,8 @@
-import { isaDocumentApi } from 'core/external-api/isa-documents-api';
+import { isaToolsApi } from 'core/external-api/isa-tools-api';
 
 export const processAndPutProfilePhoto = async (processingBucketKey: string, isaId: string) => {
   const s3Key = `public/${isaId}/profilePicture_${new Date().toISOString()}.${'jpeg'}`;
-  const result = await isaDocumentApi.processImage({
+  const result = await isaToolsApi.processImage({
     input: {
       s3: {
         key: processingBucketKey,

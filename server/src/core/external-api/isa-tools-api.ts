@@ -24,9 +24,9 @@ interface ProcessImagePayload {
   cacheControl?: string;
 }
 const api = axios.create({
-  baseURL: `https://docs-api.slacklineinternational.org`,
+  baseURL: `https://tools-api.slacklineinternational.org`,
   headers: {
-    'x-api-key': process.env.ISA_DOCUMENTS_TRUSTED_SERVICE_API_KEY,
+    'x-api-key': process.env.ISA_TOOLS_TRUSTED_SERVICE_API_KEY,
   },
 });
 
@@ -42,7 +42,7 @@ const processImage = async (payload: ProcessImagePayload) => {
 
 const listCertificates = async (isaId: string, email: string) => {
   const query = `?isaId=${isaId}&email=${email}`;
-  const response = await api.get(`certificate${query}`).then((res) => res.data);
+  const response = await api.get(`sheets/certificate${query}`).then((res) => res.data);
 
   return response as {
     certificates: {
@@ -62,7 +62,7 @@ const generateCertificate = async (payload: {
   subject: string;
   language: string;
 }) => {
-  const response = await api.post(`certificate/generate`, payload).then((res) => res.data);
+  const response = await api.post(`sheets/certificate/generate`, payload).then((res) => res.data);
   return response as {
     pdfUrl: string;
     certificateId: string;
@@ -83,7 +83,7 @@ const signDocument = async (payload: {
   };
 };
 
-export const isaDocumentApi = {
+export const isaToolsApi = {
   processImage,
   listCertificates,
   generateCertificate,

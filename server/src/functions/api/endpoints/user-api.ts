@@ -1,6 +1,6 @@
 import * as db from 'core/db';
 import { UpdateProfilePicturePostBody, UpdateUserPostBody } from '@functions/api/endpoints/types';
-import { isaDocumentApi } from 'core/external-api/isa-documents-api';
+import { isaToolsApi } from 'core/external-api/isa-tools-api';
 import { assignExistingFields } from 'core/utils';
 import { sendEmail } from 'core/utils/email';
 import {
@@ -94,7 +94,7 @@ export const getOrganizationMembershipDocument = async (req: Request) => {
     throw new Error('User is not a member of this organization');
   }
   const expiresInSeconds = 60 * 60 * 24 * 7;
-  const { token, verificationUrl, expiresAt } = await isaDocumentApi.signDocument({
+  const { token, verificationUrl, expiresAt } = await isaToolsApi.signDocument({
     subject: `${name} ${surname}`,
     expiresInSeconds: expiresInSeconds,
     createHash: true,
