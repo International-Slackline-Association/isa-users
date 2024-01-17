@@ -69,7 +69,7 @@ export const Profile = () => {
           key,
           data: file,
           options: {
-            accessLevel: 'public' as any,
+            accessLevel: 'guest',
             contentType: file.type,
           },
         })

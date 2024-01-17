@@ -56,7 +56,6 @@ export function App() {
   useEffect(() => {
     Amplify.configure(amplifyConfig);
     Hub.listen('auth', async ({ payload: { event } }) => {
-      console.log('event', event);
       switch (event) {
         case 'signedIn':
           dispatch(appActions.updateAuthState(AuthState.SignedIn));
@@ -76,7 +75,6 @@ export function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log('authState', authState);
     if (authState === AuthState.SignedIn) {
       getCurrentUser().then(async () => {
         const attributes = await fetchUserAttributes();

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
-import WorkspacesIcon from '@mui/icons-material/Workspaces';
+// import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import {
   Box,
   Divider,

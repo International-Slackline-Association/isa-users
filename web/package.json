@@ -7,7 +7,7 @@
     "start": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "eslint . && env-cmd -f .env --use-shell 'npm run build && sh ./internals/deployToS3.sh'"
+    "deploy": "eslint . && npm run build && sh ./internals/deployToS3.sh"
   },
   "dependencies": {
     "@emotion/react": "11.11.3",
@@ -27,7 +27,6 @@
     "react-qr-code": "2.0.12",
     "react-redux": "9.0.4",
     "react-router-dom": "6.21.1",
-    "vite-tsconfig-paths": "4.2.3",
     "zod": "3.22.4"
   },
   "devDependencies": {
@@ -35,7 +34,7 @@
     "@types/react": "18.2.47",
     "@types/react-dom": "18.2.18",
     "@vitejs/plugin-react": "4.2.1",
-    "env-cmd": "10.1.0",
+    "vite-tsconfig-paths": "4.2.3",
     "type-fest": "4.9.0",
     "typescript": "5.3.3",
     "vite": "5.0.11"
