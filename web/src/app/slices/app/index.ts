@@ -16,21 +16,11 @@ const appSlice = createSlice({
     updateAuthState(state, action: PayloadAction<AuthState>) {
       state.authState = action.payload;
     },
-    updateIdentityType(state, action: PayloadAction<IdentityType>) {
-      state.userIdentityType = action.payload;
-    },
+
     updateEmailVerifying(state, action: PayloadAction<boolean>) {
       state.isVerifyingEmail = action.payload;
     },
-    updateCognitoAttributes(
-      state,
-      action: PayloadAction<{ sub?: string; email_verified?: string }>,
-    ) {
-      state.cognitoAttributes = {
-        sub: action.payload.sub,
-        email_verified: action.payload.email_verified === 'true',
-      };
-    },
+
     updateSnackbarNotification(state, action: PayloadAction<SnackbarNotification | 'error'>) {
       let notification: SnackbarNotification;
       if (action.payload === 'error') {

@@ -8,3 +8,10 @@ interface ServerlessLogSubscriptionPluginConfig {
       }
     | boolean;
 }
+
+declare module '@turinggroup/serverless-express-custom-domain-middleware' {
+  interface SetupOpts {
+    onRouted: (orig: string, interpolated: string) => void;
+  }
+  export const setup: (opts?: SetupOpts) => NextHandleFunction;
+}

@@ -20,7 +20,7 @@
     "src/**/*.ts",
     "serverless.ts",
     "infrastructure/**/*.ts",
-    "misc/scripts/**/*.{ts, json}"
+    "misc/scripts/**/*.{ts,json}"
   ],
   "exclude": ["node_modules/**/*"],
   "ts-node": {

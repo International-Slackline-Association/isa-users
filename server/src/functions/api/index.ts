@@ -7,6 +7,12 @@ const lambda: AWS['functions'][0] = {
     {
       http: {
         method: 'any',
+        path: '/verify/{proxy+}',
+      },
+    },
+    {
+      http: {
+        method: 'any',
         path: '/{proxy+}',
         cors: {
           origin: '*',

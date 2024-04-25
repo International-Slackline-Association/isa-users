@@ -1,6 +1,5 @@
 import { AnyAction, Reducer } from '@reduxjs/toolkit';
 import type { AppState } from 'app/slices/app/types';
-import type { OrganizationState } from 'app/slices/organization/types';
 import type { UserState } from 'app/slices/user/types';
 
 // [IMPORT NEW CONTAINERSTATE ABOVE] < Needed for generating containers seamlessly
@@ -33,6 +32,5 @@ export interface RootState {
   api: any;
   app?: AppState;
   user?: UserState;
-  organization?: OrganizationState;
   // [INSERT NEW REDUCER KEY ABOVE] < Needed for generating containers seamlessly
 }

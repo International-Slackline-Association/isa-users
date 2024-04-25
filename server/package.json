@@ -12,11 +12,9 @@
     "deploy:cognito": "serverless deploy function -f cognitoTrigger",
     "deploy:verification-api": "serverless deploy function -f verificationApi",
     "deploy:public-api": "serverless deploy function -f publicApi",
-    "invoke:migrations": "serverless invoke local -f migrations",
+    "invoke:scripts": "serverless invoke local -f scripts",
     "scripts:create-user": "ts-node misc/scripts/create-user.ts",
-    "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts",
-    "scripts:remindUnverifiedUsers": "ts-node misc/scripts/remindUnverifiedUsers.ts",
-    "scripts:listOrganizationMembers": "ts-node misc/scripts/listOrganizationMembers.ts"
+    "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts"
   },
   "engines": {
     "node": ">=20",
@@ -29,7 +27,7 @@
     "@aws-sdk/client-ses": "3.489.0",
     "@aws-sdk/client-ssm": "3.489.0",
     "@aws-sdk/lib-dynamodb": "3.489.0",
-    "@vendia/serverless-express": "4.12.6",
+    "@codegenie/serverless-express": "4.14.0",
     "cors": "2.8.5",
     "express": "4.18.2",
     "googleapis": "130.0.0",

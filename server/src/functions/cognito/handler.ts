@@ -1,10 +1,9 @@
 import * as db from 'core/db';
-import { AdminUpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 import type { PostConfirmationTriggerEvent, PreSignUpTriggerEvent } from 'aws-lambda';
-import { cisProvider } from 'core/aws/clients';
-import { slacklineDataApi } from 'core/external-api/slackline-data-api';
 import { logger } from 'core/logger';
 import { generateISAIdFromUsername } from 'core/utils';
+
+import { sendEmailVerificationLink } from './verify';
 
 logger.updateMeta({ lambdaName: 'cognito-trigger' });
 const cognitoTrigger = async (event: PreSignUpTriggerEvent | PostConfirmationTriggerEvent) => {
@@ -17,7 +16,11 @@ const cognitoTrigger = async (event: PreSignUpTriggerEvent | PostConfirmationTri
       event.response.autoConfirmUser = true;
     }
     if (event.triggerSource === 'PostConfirmation_ConfirmSignUp') {
-      await updateCognitoAttributes(event.userName, event.userPoolId, event.request.userAttributes);
+      try {
+        await sendEmailVerificationLink(event.userName, event.request.userAttributes.email);
+      } catch (e) {
+        logger.error(e.message, { event });
+      }
     }
     return event;
   } catch (error) {
@@ -31,50 +34,15 @@ const createUser = async (
   attrs: { name?: string; family_name?: string; email?: string; sub?: string },
 ) => {
   const isaId = generateISAIdFromUsername(username);
-  const isaMembers = await slacklineDataApi.getIsaMembersList();
-  const isaMember = isaMembers.find((member) => member.email === attrs.email);
-  if (isaMember) {
-    await db.putOrganization({
-      organizationId: isaId,
-      email: attrs.email,
-      name: isaMember.name || attrs.name,
-      cognitoSub: attrs.sub || username,
-      cognitoUsername: username,
-      memberType: isaMember.memberType,
-      createdDateTime: new Date().toISOString(),
-    });
-  } else {
-    await db.putUser({
-      userId: isaId,
-      email: attrs.email,
-      name: attrs.name,
-      surname: attrs.family_name,
-      cognitoUsername: username,
-      cognitoSub: attrs.sub || username,
-      createdDateTime: new Date().toISOString(),
-    });
-  }
-};
-
-const updateCognitoAttributes = async (
-  username: string,
-  userPoolId: string,
-  attrs: { name?: string; family_name?: string; email?: string; sub?: string },
-) => {
-  const isaMembers = await slacklineDataApi.getIsaMembersList();
-  const isaMember = isaMembers.find((member) => member.email === attrs.email);
-  await cisProvider.send(
-    new AdminUpdateUserAttributesCommand({
-      UserPoolId: userPoolId,
-      Username: username,
-      UserAttributes: [
-        {
-          Name: 'custom:identityType',
-          Value: isaMember ? 'organization' : 'individual',
-        },
-      ],
-    }),
-  );
+  await db.putUser({
+    userId: isaId,
+    email: attrs.email,
+    name: attrs.name,
+    surname: attrs.family_name,
+    cognitoUsername: username,
+    cognitoSub: attrs.sub || username,
+    createdDateTime: new Date().toISOString(),
+  });
 };
 
 export const main = cognitoTrigger;

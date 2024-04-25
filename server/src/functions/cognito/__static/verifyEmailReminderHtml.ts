@@ -1,3 +1,4 @@
+export default `
 <!DOCTYPE html>
 <html>
   <head>
@@ -352,7 +353,6 @@
     </style>
   </head>
   <body>
-    <span class="preheader">Registered to ISA Account.</span>
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -381,19 +381,24 @@
                             display: block;
                           "
                         />
-                        <p>{HEADER_TEXT}</p>
-                        <p>To manage users please login to your organization's profile.</p>
+                        <p>
+                          Please verify your email address by clicking the button below. The link will expire in 7 days.
+                        </p>
+                        <p>
+                          If you did not create an account with us, please ignore this email.
+                        </p>
+                        
 
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
-                              <td align="left">
+                              <td align="center">
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
                                       <td>
-                                        <a href="https://account.slacklineinternational.org" target="_blank"
-                                          >ISA Account</a
+                                        <a href="{{VERIFICATION_URL}}" target="_blank"
+                                          >Verify your email address</a
                                         >
                                       </td>
                                     </tr>
@@ -433,3 +438,4 @@
     </table>
   </body>
 </html>
+`;

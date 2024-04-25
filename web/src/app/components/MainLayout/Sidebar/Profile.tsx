@@ -17,9 +17,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import { organizationApi } from 'app/api/organization-api';
 import { userApi } from 'app/api/user-api';
-import { selectCurrentUserInfo } from 'app/slices/app/selectors';
+import { selectUserInfo } from 'app/slices/user/selectors';
 import { uploadData } from 'aws-amplify/storage';
 import copy from 'clipboard-copy';
 import { imageUrlFromS3Key, showErrorNotification } from 'utils';
@@ -28,7 +27,7 @@ const allowedFileTypes = ['image/jpg', 'image/png', 'image/jpeg', 'image/heic', 
 export const Profile = () => {
   const [isUpdatingImage, setIsUpdatingImage] = useState(false);
 
-  const userInfo = useSelector(selectCurrentUserInfo);
+  const userInfo = useSelector(selectUserInfo);
 
   const dispatch = useDispatch();
 
@@ -37,9 +36,6 @@ export const Profile = () => {
 
   const [updateUserProfilePicture, { isLoading: isUpdatingUser }] =
     userApi.useUpdateUserProfilePictureMutation();
-
-  const [updateOrganizationProfilePicture, { isLoading: isUpdatingOrganization }] =
-    organizationApi.useUpdateOrganizationProfilePictureMutation();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -94,7 +90,7 @@ export const Profile = () => {
   };
 
   const generateS3Key = (imageType: string) => {
-    const folder = userInfo?.isaId ?? `anynomous/${new Date().toISOString()}`;
+    const folder = userInfo?.userId ?? `anynomous/${new Date().toISOString()}`;
     const ext = imageType.split('/')[1];
     const randomId = Math.random().toString(36).substring(2, 8);
     return {
@@ -103,11 +99,7 @@ export const Profile = () => {
   };
 
   const updateProfilePicture = (s3Key: string | null) => {
-    if (userInfo?.identityType === 'individual') {
-      updateUserProfilePicture({ processingBucketKey: s3Key });
-    } else if (userInfo?.identityType === 'organization') {
-      updateOrganizationProfilePicture({ processingBucketKey: s3Key });
-    }
+    updateUserProfilePicture({ processingBucketKey: s3Key });
     setIsUpdatingImage(false);
   };
 
@@ -132,7 +124,7 @@ export const Profile = () => {
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
-          {isUpdatingImage || isUpdatingUser || isUpdatingOrganization ? (
+          {isUpdatingImage || isUpdatingUser ? (
             <CircularProgress />
           ) : (
             <Avatar
@@ -187,10 +179,10 @@ export const Profile = () => {
       >
         <Typography variant="caption">ISA ID: </Typography>
         <Typography variant="caption" sx={{}}>
-          <b>{userInfo?.isaId}</b>
+          <b>{userInfo?.userId}</b>
         </Typography>
         <Tooltip title={'Copy to clipboard'}>
-          <IconButton onClick={() => copy(userInfo?.isaId ?? '')} size="small" color="inherit">
+          <IconButton onClick={() => copy(userInfo?.userId ?? '')} size="small" color="inherit">
             <ContentCopyIcon sx={{ fontSize: '1rem' }} />
           </IconButton>
         </Tooltip>

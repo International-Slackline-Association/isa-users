@@ -83,9 +83,21 @@ const signDocument = async (payload: {
   };
 };
 
+const verifySignedDocument = async (token: string) => {
+  const response = await api.get(`sign/verify?token=${token}`).then((res) => res.data);
+  return response as {
+    isVerified: boolean;
+    subject: string;
+    issuedAt: string;
+    expiresAt: string;
+    content: string;
+  };
+};
+
 export const isaToolsApi = {
   processImage,
   listCertificates,
   generateCertificate,
   signDocument,
+  verifySignedDocument,
 };

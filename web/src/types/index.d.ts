@@ -1,1 +1,0 @@
-type IdentityType = 'individual' | 'organization';

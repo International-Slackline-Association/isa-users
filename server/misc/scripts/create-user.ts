@@ -11,7 +11,6 @@ interface Options {
   username: string;
   name: string;
   surname: string;
-  identityType?: 'organization' | 'individual';
 }
 
 const createUser = async (opts: Options) => {
@@ -38,7 +37,7 @@ const createUser = async (opts: Options) => {
         },
         {
           Name: 'custom:identityType',
-          Value: opts.identityType || 'individual',
+          Value: 'individual',
         },
       ],
     }),
@@ -63,8 +62,4 @@ if (!email || !name || !surname || !type) {
   throw new Error('Missing arguments');
 }
 
-if (type !== 'individual' && type !== 'organization') {
-  throw new Error('Wrong type');
-}
-
-createUser({ username: email, name, surname, identityType: type });
+createUser({ username: email, name, surname });

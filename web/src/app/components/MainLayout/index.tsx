@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { Box } from '@mui/system';
 
-import { selectCurrentUserInfo } from 'app/slices/app/selectors';
+import { selectUserInfo } from 'app/slices/user/selectors';
 import { useMediaQuery } from 'utils/hooks/useMediaQuery';
 
 import { Sidebar } from './Sidebar';
@@ -12,7 +12,7 @@ import { Topbar } from './Topbar';
 export const MainLayout = (props: { children: React.ReactNode }) => {
   const { children } = props;
 
-  const currentUserInfo = useSelector(selectCurrentUserInfo);
+  const currentUserInfo = useSelector(selectUserInfo);
 
   const { isDesktop } = useMediaQuery();
 

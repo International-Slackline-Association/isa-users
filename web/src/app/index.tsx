@@ -7,51 +7,35 @@ import { CircularProgress } from '@mui/material';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
 import { amplifyConfig } from 'amplifyConfig';
-import { organizationApi } from 'app/api/organization-api';
 import { userApi } from 'app/api/user-api';
 import { MainLayout } from 'app/components/MainLayout';
 import NotificationSnackbar from 'app/components/NotificationSnackbar';
-import { OrganizationMembersPage } from 'app/pages/Organization/Members/Loadable';
-import { OrganizationCertificates } from 'app/pages/Organization/OrganizationCertificates/Loadable';
-import { OrganizationProfilePage } from 'app/pages/Organization/Profile/Loadable';
 import { SignIn } from 'app/pages/SignIn';
 import { UserCertificates } from 'app/pages/User/UserCertificates/Loadable';
 import { appActions, useAppSlice } from 'app/slices/app';
-import {
-  selectAuthState,
-  selectCurrentUserInfo,
-  selectSnackbarNotification,
-} from 'app/slices/app/selectors';
+import { selectAuthState, selectSnackbarNotification } from 'app/slices/app/selectors';
 import { AuthState } from 'app/slices/app/types';
-import { useOrganizationSlice } from 'app/slices/organization';
 import { useUserSlice } from 'app/slices/user';
 import { Amplify } from 'aws-amplify';
-import { fetchUserAttributes, getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
+import { getCurrentUser, signInWithRedirect, signOut } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 
 import { withErrorHandler } from './components/error-handling';
 import AppErrorBoundaryFallback from './components/error-handling/fallbacks/App';
 import { UserProfilePage } from './pages/User/Profile/Loadable';
-import { UserOrganizationsPage } from './pages/User/UserOrganizations/Loadable';
+import { selectUserInfo } from './slices/user/selectors';
 
 export function App() {
   useAppSlice();
   useUserSlice();
-  useOrganizationSlice();
 
   const dispatch = useDispatch();
 
   const authState = useSelector(selectAuthState);
-  const currentUserInfo = useSelector(selectCurrentUserInfo);
+  const currentUserInfo = useSelector(selectUserInfo);
   const snackbarNotification = useSelector(selectSnackbarNotification);
 
-  const isIndividual = currentUserInfo?.identityType === 'individual';
-  const isOrganization = currentUserInfo?.identityType === 'organization';
-
-  userApi.useGetUserDetailsQuery(undefined, { skip: !isIndividual });
-  organizationApi.useGetOrganizationDetailsQuery(undefined, {
-    skip: !isOrganization,
-  });
+  userApi.useGetUserDetailsQuery(undefined, { skip: authState !== AuthState.SignedIn });
 
   useEffect(() => {
     Amplify.configure(amplifyConfig);
@@ -75,17 +59,7 @@ export function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (authState === AuthState.SignedIn) {
-      getCurrentUser().then(async () => {
-        const attributes = await fetchUserAttributes();
-        const identityType = (attributes['custom:identityType'] as IdentityType) || 'individual';
-        dispatch(appActions.updateIdentityType(identityType));
-        dispatch(appActions.updateCognitoAttributes(attributes));
-      });
-      // .catch(() => {
-      //   dispatch(appActions.updateAuthState(AuthState.SigningOut));
-      // });
-    } else if (authState === AuthState.SigningOut) {
+    if (authState === AuthState.SigningOut) {
       signOut();
     }
   }, [authState, dispatch]);
@@ -102,25 +76,9 @@ export function App() {
   const MainApp = () => {
     return (
       <Routes>
-        {isIndividual && <Route path="/user/profile" element={<UserProfilePage />} />}
-        {isIndividual && <Route path="/user/organizations" element={<UserOrganizationsPage />} />}
-
-        {isIndividual && <Route path="/user/certificates" element={<UserCertificates />} />}
-
-        {isOrganization && (
-          <Route path="/organization/profile" element={<OrganizationProfilePage />} />
-        )}
-
-        {isOrganization && (
-          <Route path="/organization/members" element={<OrganizationMembersPage />} />
-        )}
-
-        {isOrganization && (
-          <Route path="/organization/certificates" element={<OrganizationCertificates />} />
-        )}
-
-        {isIndividual && <Route path="*" element={<Navigate to="/user/profile" />} />}
-        {isOrganization && <Route path="*" element={<Navigate to="/organization/profile" />} />}
+        <Route path="/user/profile" element={<UserProfilePage />} />
+        <Route path="/user/certificates" element={<UserCertificates />} />
+        <Route path="*" element={<Navigate to="/user/profile" />} />
       </Routes>
     );
   };

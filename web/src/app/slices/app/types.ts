@@ -1,12 +1,7 @@
 export interface AppState {
   authState?: AuthState;
   snackbarNotification: SnackbarNotification;
-  userIdentityType?: IdentityType;
   isVerifyingEmail?: boolean;
-  cognitoAttributes?: {
-    sub?: string;
-    email_verified?: boolean;
-  };
 }
 export type SnackbarNotification = {
   message: string;

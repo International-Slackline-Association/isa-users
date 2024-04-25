@@ -1,9 +1,5 @@
 import {
-  getOrganizationMembershipDocument,
-  getOrganizationsOfUser,
   getUserDetails,
-  joinOrganization,
-  leaveOrganization,
   updateUser,
   updateUserProfilePicture,
 } from '@server/functions/api/endpoints/user-api';
@@ -64,44 +60,6 @@ export const userApi = baseApi
           await queryFulfilled;
           dispatch(showSuccessNotification('Saved Changes'));
         },
-      }),
-      getOrganizationsOfUser: builder.query<
-        AsyncReturnType<typeof getOrganizationsOfUser>['items'],
-        void
-      >({
-        query: () => ({ url: `user/organizations` }),
-        providesTags: ['userOrganizations'],
-        transformResponse(response: AsyncReturnType<typeof getOrganizationsOfUser>) {
-          return response.items;
-        },
-      }),
-      leaveOrganization: builder.mutation<AsyncReturnType<typeof leaveOrganization>, string>({
-        query: (id) => ({
-          url: `user/organization/${id}`,
-          method: 'DELETE',
-        }),
-        invalidatesTags: ['userOrganizations'],
-      }),
-      joinOrganization: builder.mutation<AsyncReturnType<typeof joinOrganization>, string>({
-        query: (id) => ({
-          url: `user/organization/${id}/join`,
-          method: 'POST',
-        }),
-        invalidatesTags: ['userOrganizations'],
-        async onQueryStarted(_, { dispatch, queryFulfilled }) {
-          await queryFulfilled;
-          dispatch(
-            showSuccessNotification('Email has been sent to the organization for confirmation'),
-          );
-        },
-      }),
-
-      getOrganizationMembershipDocument: builder.query<
-        AsyncReturnType<typeof getOrganizationMembershipDocument>,
-        string
-      >({
-        query: (id) => ({ url: `user/organization/${id}/membershipDocument` }),
-        providesTags: ['userDocuments'],
       }),
     }),
   });

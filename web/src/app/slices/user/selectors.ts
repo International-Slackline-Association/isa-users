@@ -3,6 +3,6 @@ import { RootState } from 'store/types';
 
 import { initialState } from '.';
 
-const selectSlice = (state: RootState) => state.user || initialState;
+export const selectUserSlice = (state: RootState) => state.user || initialState;
 
-export const selectUserInfo = createSelector([selectSlice], (state) => state.userInfo);
+export const selectUserInfo = createSelector([selectUserSlice], (state) => state.userInfo);

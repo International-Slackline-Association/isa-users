@@ -1,7 +1,7 @@
 import api from '@functions/api';
 import cognitoTrigger from '@functions/cognito';
 import logger from '@functions/logger';
-import migrations from '@functions/migrations';
+import scripts from '@functions/scripts';
 import type { AWS } from '@serverless/typescript';
 import { backupResources } from 'infrastructure/backup';
 import { cloudwatchResources } from 'infrastructure/cloudwatch';
@@ -29,6 +29,7 @@ const serverlessConfiguration: AWS = {
       APPLICATION_LOG_GROUP_NAME: { Ref: 'CloudWatchApplicationLogs' },
       ISA_TOOLS_TRUSTED_SERVICE_API_KEY: '${ssm:/isa-tools-trusted-service-api-key}',
       ISA_USERS_IMAGES_S3_BUCKET: { Ref: 'IsaUsersImagesS3Bucket' },
+      USERPOOL_ID: 'eu-central-1_iGaYGKeyJ',
     },
     iam: {
       role: {
@@ -83,7 +84,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { api, cognitoTrigger, logger, migrations },
+  functions: { api, cognitoTrigger, logger, scripts },
   package: { individually: true },
   custom: {
     esbuild: {
