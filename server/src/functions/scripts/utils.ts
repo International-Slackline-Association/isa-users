@@ -4,8 +4,6 @@ import {
   ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-import config from '../config.json';
-
 export const cisProvider = new CognitoIdentityProviderClient();
 
 export const getAllCognitoUsers = async () => {
@@ -14,7 +12,7 @@ export const getAllCognitoUsers = async () => {
   do {
     const result = await cisProvider.send(
       new ListUsersCommand({
-        UserPoolId: config.UserPoolId,
+        UserPoolId: process.env.USERPOOL_ID,
         PaginationToken: paginationToken,
       }),
     );
@@ -34,7 +32,7 @@ export const getAllCognitoUsers = async () => {
 export const deleteCognitoUser = async (username: string) => {
   await cisProvider.send(
     new AdminDeleteUserCommand({
-      UserPoolId: config.UserPoolId,
+      UserPoolId: process.env.USERPOOL_ID,
       Username: username,
     }),
   );
