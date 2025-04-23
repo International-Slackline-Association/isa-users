@@ -13,8 +13,7 @@
     "deploy:verification-api": "serverless deploy function -f verificationApi",
     "deploy:public-api": "serverless deploy function -f publicApi",
     "invoke:scripts": "serverless invoke local -f scripts",
-    "scripts:create-user": "ts-node misc/scripts/create-user.ts",
-    "scripts:listIncorrectItems": "ts-node misc/scripts/listIncorrectItems.ts"
+    "scripts:create-user": "ts-node misc/scripts/create-user.ts"
   },
   "engines": {
     "node": ">=20",
