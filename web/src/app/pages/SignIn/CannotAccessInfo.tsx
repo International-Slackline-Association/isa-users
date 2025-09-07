@@ -6,6 +6,7 @@ export const CannotAccessInfo = () => {
       <strong>Having problems accesing your account?</strong>
       <p>There might be several reasons why you cannot access your account. For example:</p>
       <ul>
+        <li>You have NOT YET signed up. Make sure you create an account first!</li>
         <li>You have not yet verified your email and therefore you cannot reset your password.</li>
         <li>Your account is disabled.</li>
       </ul>
